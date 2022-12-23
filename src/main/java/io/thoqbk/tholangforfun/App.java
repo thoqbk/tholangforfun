@@ -1,4 +1,4 @@
-package io.thoqbk.tholgforfun;
+package io.thoqbk.tholangforfun;
 
 /**
  * Hello world!

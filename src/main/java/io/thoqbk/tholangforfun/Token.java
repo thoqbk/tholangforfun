@@ -1,4 +1,4 @@
-package io.thoqbk.tholgforfun;
+package io.thoqbk.tholangforfun;
 
 public class Token {
     private TokenType type;

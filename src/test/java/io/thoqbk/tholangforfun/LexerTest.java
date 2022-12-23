@@ -4,9 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import io.thoqbk.tholgforfun.Lexer;
-import io.thoqbk.tholgforfun.Token;
-import io.thoqbk.tholgforfun.TokenType;
+import io.thoqbk.tholangforfun.Lexer;
+import io.thoqbk.tholangforfun.Token;
+import io.thoqbk.tholangforfun.TokenType;
 
 public class LexerTest {
     @Test
