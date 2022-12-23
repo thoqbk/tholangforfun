@@ -1,4 +1,4 @@
-package io.thoqbk.monkeylang;
+package io.thoqbk.tholgforfun;
 
 public class Lexer {
     private final String input;

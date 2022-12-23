@@ -1,4 +1,4 @@
-package io.thoqbk.monkeylang;
+package io.thoqbk.tholangforfun;
 
 import static org.junit.Assert.assertTrue;
 

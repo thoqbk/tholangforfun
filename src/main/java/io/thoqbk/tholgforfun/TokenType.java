@@ -1,4 +1,4 @@
-package io.thoqbk.monkeylang;
+package io.thoqbk.tholgforfun;
 
 import java.util.Map;
 

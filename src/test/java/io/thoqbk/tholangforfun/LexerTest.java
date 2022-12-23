@@ -1,8 +1,12 @@
-package io.thoqbk.monkeylang;
+package io.thoqbk.tholangforfun;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+
+import io.thoqbk.tholgforfun.Lexer;
+import io.thoqbk.tholgforfun.Token;
+import io.thoqbk.tholgforfun.TokenType;
 
 public class LexerTest {
     @Test
