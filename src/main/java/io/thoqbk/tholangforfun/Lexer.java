@@ -15,7 +15,7 @@ public class Lexer {
         skipWhitespaces();
         int ch = readChar();
         if (ch < 0) {
-            this.currentToken = null;
+            this.currentToken = new Token(TokenType.EOF, null);
             return currentToken;
         }
         switch (ch) {

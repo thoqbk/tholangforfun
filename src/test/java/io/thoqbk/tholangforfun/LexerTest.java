@@ -19,6 +19,17 @@ public class LexerTest {
     }
 
     @Test
+    public void nextTokenShouldReturnEOFIfNoMoreToken() {
+        Lexer lexer = new Lexer("10;");
+        lexer.nextToken();
+        lexer.nextToken();
+        Token token = lexer.nextToken();
+        assertEquals(token.getType(), TokenType.EOF);
+        assertEquals(lexer.currentToken().getType(), TokenType.EOF);
+        assertEquals(lexer.nextToken().getType(), TokenType.EOF);
+    }
+
+    @Test
     public void shouldReturnCorrectTokens() {
         String input = """
             let five = 5;
