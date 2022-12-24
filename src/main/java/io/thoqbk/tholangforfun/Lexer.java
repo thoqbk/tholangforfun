@@ -4,6 +4,7 @@ public class Lexer {
     private final String input;
     private int nextChIdx = 0;
     private int ch = -1;
+    private Token currentToken;
 
     public Lexer(String input) {
         this.input = input;
@@ -14,7 +15,8 @@ public class Lexer {
         skipWhitespaces();
         int ch = readChar();
         if (ch < 0) {
-            return null;
+            this.currentToken = null;
+            return currentToken;
         }
         switch (ch) {
             case '=': {
@@ -98,7 +100,12 @@ public class Lexer {
                 }
             }
         }
+        currentToken = retVal;
         return retVal;
+    }
+
+    public Token currentToken() {
+        return this.currentToken;
     }
 
     private int readChar() {

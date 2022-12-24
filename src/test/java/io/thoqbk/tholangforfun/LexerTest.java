@@ -4,10 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import io.thoqbk.tholangforfun.Lexer;
-import io.thoqbk.tholangforfun.Token;
-import io.thoqbk.tholangforfun.TokenType;
-
 public class LexerTest {
     @Test
     public void simpleAssignmentShouldReturnCorrectTokens() {
