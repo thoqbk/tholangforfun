@@ -1,3 +1,3 @@
 # ThoLangForFun programming language
 
-TODO
+An effort to implement a simple programming language for fun
