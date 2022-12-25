@@ -3,17 +3,17 @@ package io.thoqbk.tholangforfun.ast;
 import io.thoqbk.tholangforfun.Token;
 
 public class ReturnStatement extends Statement {
-    private Expression expression;
+    private Expression value;
 
     public ReturnStatement(Token token) {
         super(token);
     }
 
-    public Expression getExpression() {
-        return expression;
+    public Expression getValue() {
+        return value;
     }
 
-    public void setExpression(Expression expression) {
-        this.expression = expression;
+    public void setValue(Expression value) {
+        this.value = value;
     }
 }

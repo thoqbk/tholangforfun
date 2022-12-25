@@ -35,4 +35,14 @@ public class ParserTest {
         assertEquals(statements.size(), 1);
         assertEquals(statements.get(0).as(ReturnStatement.class).getToken().getType(), TokenType.RETURN);
     }
+
+    @Test
+    public void parseExpressionShouldReturnCorrectIdentifier() {
+        String input = "return foobar;";
+        List<Statement> statements = new Parser(input).parse();
+        assertEquals(statements.size(), 1);
+        ReturnStatement stm = statements.get(0).as(ReturnStatement.class);
+        assertEquals(TokenType.IDENT, stm.getValue().getToken().getType());
+        assertEquals("foobar", stm.getValue().getToken().getLiteral());
+    }
 }
