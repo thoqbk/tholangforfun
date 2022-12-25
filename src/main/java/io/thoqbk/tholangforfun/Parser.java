@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import io.thoqbk.tholangforfun.ast.Expression;
 import io.thoqbk.tholangforfun.ast.Int;
 import io.thoqbk.tholangforfun.ast.LetStatement;
+import io.thoqbk.tholangforfun.ast.PrefixExpression;
 import io.thoqbk.tholangforfun.ast.ReturnStatement;
 import io.thoqbk.tholangforfun.ast.Statement;
 
@@ -15,7 +16,8 @@ public class Parser {
     private final Lexer lexer;
     private Map<TokenType, Supplier<Expression>> prefixParsers = Map.of(
             TokenType.IDENT, this::parseIdentifier,
-            TokenType.INT, this::parseInt);
+            TokenType.INT, this::parseInt,
+            TokenType.MINUS, this::parsePrefixExpression);
 
     public Parser(String input) {
         lexer = new Lexer(input);
@@ -68,10 +70,17 @@ public class Parser {
         Token token = lexer.currentToken();
         Supplier<Expression> prefix = prefixParsers.get(token.getType());
         if (prefix == null) {
-            throw new RuntimeException("Prefix parser not found for " + token.getType());
+            throw new RuntimeException("Prefix parser not found for token \'" + token.getType() + "\'");
         }
         Expression retVal = prefix.get();
         assertPeekToken(TokenType.SEMICOLON);
+        return retVal;
+    }
+
+    private Expression parsePrefixExpression() {
+        PrefixExpression retVal = new PrefixExpression(lexer.currentToken());
+        lexer.nextToken();
+        retVal.setRight(parseExpression());
         return retVal;
     }
 
@@ -91,7 +100,8 @@ public class Parser {
 
     private void assertTokenType(Token token, TokenType tokenType) {
         if (token.getType() != tokenType) {
-            throw new RuntimeException("Expect next token " + tokenType + ", was " + token.getType());
+            throw new RuntimeException(
+                    "Expect token to be \'" + tokenType + "\', received \'" + token.getType() + "\' instead");
         }
     }
 }

@@ -6,7 +6,9 @@ import java.util.List;
 
 import org.junit.Test;
 
+import io.thoqbk.tholangforfun.ast.Int;
 import io.thoqbk.tholangforfun.ast.LetStatement;
+import io.thoqbk.tholangforfun.ast.PrefixExpression;
 import io.thoqbk.tholangforfun.ast.ReturnStatement;
 import io.thoqbk.tholangforfun.ast.Statement;
 
@@ -44,5 +46,16 @@ public class ParserTest {
         ReturnStatement stm = statements.get(0).as(ReturnStatement.class);
         assertEquals(TokenType.IDENT, stm.getValue().getToken().getType());
         assertEquals("foobar", stm.getValue().getToken().getLiteral());
+    }
+
+    @Test
+    public void parsePrefixMinusShouldReturnPrefixExpression() {
+        String input = "let abc = -1000;";
+        List<Statement> statements = new Parser(input).parse();
+        assertEquals(1, statements.size());
+        PrefixExpression prefix = statements.get(0).as(LetStatement.class).getExpression().as(PrefixExpression.class);
+        assertEquals(TokenType.MINUS, prefix.getToken().getType());
+        Int intExpression = prefix.getRight().as(Int.class);
+        assertEquals(1000, intExpression.getValue());
     }
 }
