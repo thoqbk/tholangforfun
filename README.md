@@ -1,0 +1,3 @@
+# ThoLangForFun programming language
+
+TODO
