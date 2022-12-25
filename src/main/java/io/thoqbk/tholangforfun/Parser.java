@@ -3,9 +3,11 @@ package io.thoqbk.tholangforfun;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import io.thoqbk.tholangforfun.ast.Expression;
+import io.thoqbk.tholangforfun.ast.InfixExpression;
 import io.thoqbk.tholangforfun.ast.Int;
 import io.thoqbk.tholangforfun.ast.LetStatement;
 import io.thoqbk.tholangforfun.ast.PrefixExpression;
@@ -18,6 +20,8 @@ public class Parser {
             TokenType.IDENT, this::parseIdentifier,
             TokenType.INT, this::parseInt,
             TokenType.MINUS, this::parsePrefixExpression);
+    private Map<TokenType, Function<Expression, Expression>> infixParsers = Map.of(
+            TokenType.PLUS, this::parseInfixExpression);
 
     public Parser(String input) {
         lexer = new Lexer(input);
@@ -70,15 +74,30 @@ public class Parser {
         Token token = lexer.currentToken();
         Supplier<Expression> prefix = prefixParsers.get(token.getType());
         if (prefix == null) {
-            throw new RuntimeException("Prefix parser not found for token \'" + token.getType() + "\'");
+            throw new RuntimeException("Prefix parser not found for token '" + token.getType() + "'");
         }
-        Expression retVal = prefix.get();
-        assertPeekToken(TokenType.SEMICOLON);
-        return retVal;
+        Expression left = prefix.get();
+        if (peekTokenIs(TokenType.SEMICOLON)) {
+            return left;
+        }
+        lexer.nextToken();
+        var infix = infixParsers.get(lexer.currentToken().getType());
+        if (infix == null) {
+            throw new RuntimeException("Infix parser not found for token '" + lexer.currentToken().getType() + "'");
+        }
+        return parseInfixExpression(left);
     }
 
     private Expression parsePrefixExpression() {
         PrefixExpression retVal = new PrefixExpression(lexer.currentToken());
+        lexer.nextToken();
+        retVal.setRight(parseExpression());
+        return retVal;
+    }
+
+    private Expression parseInfixExpression(Expression left) {
+        InfixExpression retVal = new InfixExpression(lexer.currentToken());
+        retVal.setLeft(left);
         lexer.nextToken();
         retVal.setRight(parseExpression());
         return retVal;
@@ -96,6 +115,10 @@ public class Parser {
         Token retVal = lexer.peekToken();
         assertTokenType(retVal, type);
         return retVal;
+    }
+
+    private boolean peekTokenIs(TokenType type) {
+        return lexer.peekToken().getType() == type;
     }
 
     private void assertTokenType(Token token, TokenType tokenType) {

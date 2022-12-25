@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import io.thoqbk.tholangforfun.ast.InfixExpression;
 import io.thoqbk.tholangforfun.ast.Int;
 import io.thoqbk.tholangforfun.ast.LetStatement;
 import io.thoqbk.tholangforfun.ast.PrefixExpression;
@@ -57,5 +58,19 @@ public class ParserTest {
         assertEquals(TokenType.MINUS, prefix.getToken().getType());
         Int intExpression = prefix.getRight().as(Int.class);
         assertEquals(1000, intExpression.getValue());
+    }
+
+    @Test
+    public void parseInfixShouldReturnLeftAndRight() {
+        String input = "return 100 + 200;";
+        List<Statement> statements = new Parser(input).parse();
+        assertEquals(1, statements.size());
+        InfixExpression infix = statements.get(0).as(ReturnStatement.class).getValue().as(InfixExpression.class);
+        assertEquals(TokenType.PLUS, infix.getToken().getType());
+
+        Int left = infix.getLeft().as(Int.class);
+        Int right = infix.getRight().as(Int.class);
+        assertEquals(100, left.getValue());
+        assertEquals(200, right.getValue());
     }
 }
