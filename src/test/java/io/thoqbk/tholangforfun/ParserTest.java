@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.Test;
 
 import io.thoqbk.tholangforfun.ast.LetStatement;
+import io.thoqbk.tholangforfun.ast.ReturnStatement;
 import io.thoqbk.tholangforfun.ast.Statement;
 
 public class ParserTest {
@@ -25,5 +26,13 @@ public class ParserTest {
 
         LetStatement let2 = statements.get(1).as(LetStatement.class);
         assertEquals(let2.getVariableName(), "abc");
+    }
+
+    @Test
+    public void parseReturnStatementShouldReturnCorrectToken() {
+        String input = "return 10;";
+        List<Statement> statements = new Parser(input).parse();
+        assertEquals(statements.size(), 1);
+        assertEquals(statements.get(0).as(ReturnStatement.class).getToken().getType(), TokenType.RETURN);
     }
 }

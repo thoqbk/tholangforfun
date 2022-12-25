@@ -5,6 +5,7 @@ import java.util.List;
 
 import io.thoqbk.tholangforfun.ast.Expression;
 import io.thoqbk.tholangforfun.ast.LetStatement;
+import io.thoqbk.tholangforfun.ast.ReturnStatement;
 import io.thoqbk.tholangforfun.ast.Statement;
 
 public class Parser {
@@ -26,6 +27,10 @@ public class Parser {
                     retVal.add(parseLetStatement());
                     break;
                 }
+                case RETURN: {
+                    retVal.add(parseReturnStatement());
+                    break;
+                }
                 default: {
                     continue;
                 }
@@ -40,6 +45,12 @@ public class Parser {
         assertTokenType(variable, TokenType.IDENT);
         retVal.setVariableName(variable.getLiteral());
         assertPeekTokenAndNext(TokenType.ASSIGN);
+        retVal.setExpression(parseExpression());
+        return retVal;
+    }
+
+    private Statement parseReturnStatement() {
+        ReturnStatement retVal = new ReturnStatement(lexer.currentToken());
         retVal.setExpression(parseExpression());
         return retVal;
     }
