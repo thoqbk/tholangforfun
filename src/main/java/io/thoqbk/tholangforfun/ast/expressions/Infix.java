@@ -1,12 +1,12 @@
-package io.thoqbk.tholangforfun.ast;
+package io.thoqbk.tholangforfun.ast.expressions;
 
 import io.thoqbk.tholangforfun.Token;
 
-public class InfixExpression extends Expression {
+public class Infix extends Expression {
     private Expression left;
     private Expression right;
 
-    public InfixExpression(Token token) {
+    public Infix(Token token) {
         super(token);
     }
 

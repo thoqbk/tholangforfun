@@ -6,13 +6,13 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import io.thoqbk.tholangforfun.ast.Expression;
-import io.thoqbk.tholangforfun.ast.InfixExpression;
-import io.thoqbk.tholangforfun.ast.Int;
 import io.thoqbk.tholangforfun.ast.LetStatement;
-import io.thoqbk.tholangforfun.ast.PrefixExpression;
 import io.thoqbk.tholangforfun.ast.ReturnStatement;
 import io.thoqbk.tholangforfun.ast.Statement;
+import io.thoqbk.tholangforfun.ast.expressions.Expression;
+import io.thoqbk.tholangforfun.ast.expressions.Infix;
+import io.thoqbk.tholangforfun.ast.expressions.Int;
+import io.thoqbk.tholangforfun.ast.expressions.Prefix;
 
 public class Parser {
     private final Lexer lexer;
@@ -89,14 +89,14 @@ public class Parser {
     }
 
     private Expression parsePrefixExpression() {
-        PrefixExpression retVal = new PrefixExpression(lexer.currentToken());
+        Prefix retVal = new Prefix(lexer.currentToken());
         lexer.nextToken();
         retVal.setRight(parseExpression());
         return retVal;
     }
 
     private Expression parseInfixExpression(Expression left) {
-        InfixExpression retVal = new InfixExpression(lexer.currentToken());
+        Infix retVal = new Infix(lexer.currentToken());
         retVal.setLeft(left);
         lexer.nextToken();
         retVal.setRight(parseExpression());

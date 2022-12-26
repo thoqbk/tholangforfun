@@ -1,6 +1,7 @@
 package io.thoqbk.tholangforfun.ast;
 
 import io.thoqbk.tholangforfun.Token;
+import io.thoqbk.tholangforfun.ast.expressions.Expression;
 
 public class LetStatement extends Statement {
     private String variableName;

@@ -1,4 +1,4 @@
-package io.thoqbk.tholangforfun.ast;
+package io.thoqbk.tholangforfun.ast.expressions;
 
 import io.thoqbk.tholangforfun.Token;
 

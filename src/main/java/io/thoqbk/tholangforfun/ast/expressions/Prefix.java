@@ -1,11 +1,11 @@
-package io.thoqbk.tholangforfun.ast;
+package io.thoqbk.tholangforfun.ast.expressions;
 
 import io.thoqbk.tholangforfun.Token;
 
-public class PrefixExpression extends Expression {
+public class Prefix extends Expression {
     private Expression right;
 
-    public PrefixExpression(Token token) {
+    public Prefix(Token token) {
         super(token);
     }
 

@@ -6,12 +6,12 @@ import java.util.List;
 
 import org.junit.Test;
 
-import io.thoqbk.tholangforfun.ast.InfixExpression;
-import io.thoqbk.tholangforfun.ast.Int;
 import io.thoqbk.tholangforfun.ast.LetStatement;
-import io.thoqbk.tholangforfun.ast.PrefixExpression;
 import io.thoqbk.tholangforfun.ast.ReturnStatement;
 import io.thoqbk.tholangforfun.ast.Statement;
+import io.thoqbk.tholangforfun.ast.expressions.Infix;
+import io.thoqbk.tholangforfun.ast.expressions.Int;
+import io.thoqbk.tholangforfun.ast.expressions.Prefix;
 
 public class ParserTest {
     @Test
@@ -54,7 +54,7 @@ public class ParserTest {
         String input = "let abc = -1000;";
         List<Statement> statements = new Parser(input).parse();
         assertEquals(1, statements.size());
-        PrefixExpression prefix = statements.get(0).as(LetStatement.class).getExpression().as(PrefixExpression.class);
+        Prefix prefix = statements.get(0).as(LetStatement.class).getExpression().as(Prefix.class);
         assertEquals(TokenType.MINUS, prefix.getToken().getType());
         Int intExpression = prefix.getRight().as(Int.class);
         assertEquals(1000, intExpression.getValue());
@@ -65,7 +65,7 @@ public class ParserTest {
         String input = "return 100 + 200;";
         List<Statement> statements = new Parser(input).parse();
         assertEquals(1, statements.size());
-        InfixExpression infix = statements.get(0).as(ReturnStatement.class).getValue().as(InfixExpression.class);
+        Infix infix = statements.get(0).as(ReturnStatement.class).getValue().as(Infix.class);
         assertEquals(TokenType.PLUS, infix.getToken().getType());
 
         Int left = infix.getLeft().as(Int.class);
