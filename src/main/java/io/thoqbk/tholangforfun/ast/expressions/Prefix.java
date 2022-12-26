@@ -16,4 +16,9 @@ public class Prefix extends Expression {
     public Expression getRight() {
         return right;
     }
+
+    @Override
+    public String toString() {
+        return String.format("(%s%s)", getToken(), right);
+    }
 }

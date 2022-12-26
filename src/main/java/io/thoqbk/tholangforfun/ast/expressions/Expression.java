@@ -2,7 +2,7 @@ package io.thoqbk.tholangforfun.ast.expressions;
 
 import io.thoqbk.tholangforfun.Token;
 
-public class Expression {
+public abstract class Expression {
     // start token of the expression e.g. ! in prefix expression
     private Token token;
 

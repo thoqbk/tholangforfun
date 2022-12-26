@@ -10,6 +10,7 @@ import io.thoqbk.tholangforfun.ast.LetStatement;
 import io.thoqbk.tholangforfun.ast.ReturnStatement;
 import io.thoqbk.tholangforfun.ast.Statement;
 import io.thoqbk.tholangforfun.ast.expressions.Expression;
+import io.thoqbk.tholangforfun.ast.expressions.Identifier;
 import io.thoqbk.tholangforfun.ast.expressions.Infix;
 import io.thoqbk.tholangforfun.ast.expressions.Int;
 import io.thoqbk.tholangforfun.ast.expressions.Prefix;
@@ -104,7 +105,7 @@ public class Parser {
     }
 
     private Expression parseIdentifier() {
-        return new Expression(lexer.currentToken());
+        return new Identifier(lexer.currentToken());
     }
 
     private Expression parseInt() {

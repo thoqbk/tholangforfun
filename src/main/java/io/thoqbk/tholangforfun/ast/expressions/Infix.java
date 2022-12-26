@@ -25,4 +25,9 @@ public class Infix extends Expression {
     public Expression getRight() {
         return right;
     }
+
+    @Override
+    public String toString() {
+        return String.format("(%s %s %s)", left, getToken(), right);
+    }
 }
