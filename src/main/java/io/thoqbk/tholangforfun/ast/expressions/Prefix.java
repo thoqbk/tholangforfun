@@ -19,6 +19,6 @@ public class Prefix extends Expression {
 
     @Override
     public String toString() {
-        return String.format("(%s%s)", getToken(), right);
+        return String.format("(%s%s)", getToken().getLiteral(), right);
     }
 }

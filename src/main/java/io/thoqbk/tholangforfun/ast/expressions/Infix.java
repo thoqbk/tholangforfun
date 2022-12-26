@@ -28,6 +28,6 @@ public class Infix extends Expression {
 
     @Override
     public String toString() {
-        return String.format("(%s %s %s)", left, getToken(), right);
+        return String.format("(%s %s %s)", left, getToken().getLiteral(), right);
     }
 }

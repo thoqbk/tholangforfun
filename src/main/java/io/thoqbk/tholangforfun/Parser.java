@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import io.thoqbk.tholangforfun.ast.ExpressionStatement;
 import io.thoqbk.tholangforfun.ast.LetStatement;
 import io.thoqbk.tholangforfun.ast.ReturnStatement;
 import io.thoqbk.tholangforfun.ast.Statement;
@@ -22,7 +23,16 @@ public class Parser {
             TokenType.INT, this::parseInt,
             TokenType.MINUS, this::parsePrefixExpression);
     private Map<TokenType, Function<Expression, Expression>> infixParsers = Map.of(
-            TokenType.PLUS, this::parseInfixExpression);
+            TokenType.PLUS, this::parseInfixExpression,
+            TokenType.MINUS, this::parseInfixExpression,
+            TokenType.SLASH, this::parseInfixExpression,
+            TokenType.ASTERISK, this::parseInfixExpression);
+    private static final int LOWEST_PRECEDENCE = 0;
+    private Map<TokenType, Integer> precedences = Map.of(
+            TokenType.PLUS, 1,
+            TokenType.MINUS, 1,
+            TokenType.SLASH, 2,
+            TokenType.ASTERISK, 2);
 
     public Parser(String input) {
         lexer = new Lexer(input);
@@ -45,7 +55,7 @@ public class Parser {
                     break;
                 }
                 default: {
-                    continue;
+                    retVal.add(parseExpressionStatement());
                 }
             }
         }
@@ -61,6 +71,7 @@ public class Parser {
         lexer.nextToken();
         lexer.nextToken();
         retVal.setExpression(parseExpression());
+        assertTokenType(lexer.nextToken(), TokenType.SEMICOLON);
         return retVal;
     }
 
@@ -68,25 +79,44 @@ public class Parser {
         ReturnStatement retVal = new ReturnStatement(lexer.currentToken());
         lexer.nextToken();
         retVal.setValue(parseExpression());
+        assertTokenType(lexer.nextToken(), TokenType.SEMICOLON);
+        return retVal;
+    }
+
+    private Statement parseExpressionStatement() {
+        var retVal = new ExpressionStatement(parseExpression());
+        if (peekTokenIs(TokenType.SEMICOLON)) {
+            lexer.nextToken();
+        }
         return retVal;
     }
 
     private Expression parseExpression() {
+        return parseExpression(LOWEST_PRECEDENCE);
+    }
+
+    private Expression parseExpression(int prevPrecedence) {
         Token token = lexer.currentToken();
         Supplier<Expression> prefix = prefixParsers.get(token.getType());
         if (prefix == null) {
             throw new RuntimeException("Prefix parser not found for token '" + token.getType() + "'");
         }
         Expression left = prefix.get();
-        if (peekTokenIs(TokenType.SEMICOLON)) {
-            return left;
+        while (true) {
+            if (peekTokenIs(TokenType.SEMICOLON)) {
+                return left;
+            }
+            if (peekPrecedence() <= prevPrecedence) {
+                break;
+            }
+            lexer.nextToken();
+            var infix = infixParsers.get(lexer.currentToken().getType());
+            if (infix == null) {
+                throw new RuntimeException("Infix parser not found for token '" + lexer.currentToken().getType() + "'");
+            }
+            left = infix.apply(left);
         }
-        lexer.nextToken();
-        var infix = infixParsers.get(lexer.currentToken().getType());
-        if (infix == null) {
-            throw new RuntimeException("Infix parser not found for token '" + lexer.currentToken().getType() + "'");
-        }
-        return parseInfixExpression(left);
+        return left;
     }
 
     private Expression parsePrefixExpression() {
@@ -98,9 +128,10 @@ public class Parser {
 
     private Expression parseInfixExpression(Expression left) {
         Infix retVal = new Infix(lexer.currentToken());
+        int precedence = currentPrecedence();
         retVal.setLeft(left);
         lexer.nextToken();
-        retVal.setRight(parseExpression());
+        retVal.setRight(parseExpression(precedence));
         return retVal;
     }
 
@@ -127,5 +158,22 @@ public class Parser {
             throw new RuntimeException(
                     "Expect token to be \'" + tokenType + "\', received \'" + token.getType() + "\' instead");
         }
+    }
+
+    private int currentPrecedence() {
+        TokenType type = lexer.currentToken().getType();
+        return precedence(type);
+    }
+
+    private int peekPrecedence() {
+        TokenType type = lexer.peekToken().getType();
+        return precedence(type);
+    }
+
+    private int precedence(TokenType type) {
+        if (!precedences.containsKey(type)) {
+            throw new RuntimeException("Precedence not found for token '" + type + "'");
+        }
+        return precedences.get(type);
     }
 }
