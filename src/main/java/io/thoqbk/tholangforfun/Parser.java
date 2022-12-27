@@ -21,18 +21,28 @@ public class Parser {
     private Map<TokenType, Supplier<Expression>> prefixParsers = Map.of(
             TokenType.IDENT, this::parseIdentifier,
             TokenType.INT, this::parseInt,
-            TokenType.MINUS, this::parsePrefixExpression);
+            TokenType.MINUS, this::parsePrefixExpression,
+            TokenType.BANG, this::parsePrefixExpression);
     private Map<TokenType, Function<Expression, Expression>> infixParsers = Map.of(
             TokenType.PLUS, this::parseInfixExpression,
             TokenType.MINUS, this::parseInfixExpression,
             TokenType.SLASH, this::parseInfixExpression,
-            TokenType.ASTERISK, this::parseInfixExpression);
+            TokenType.ASTERISK, this::parseInfixExpression,
+            TokenType.GT, this::parseInfixExpression,
+            TokenType.LT, this::parseInfixExpression,
+            TokenType.EQ, this::parseInfixExpression,
+            TokenType.NOT_EQ, this::parseInfixExpression);
     private static final int LOWEST_PRECEDENCE = 0;
     private Map<TokenType, Integer> precedences = Map.of(
-            TokenType.PLUS, 1,
-            TokenType.MINUS, 1,
-            TokenType.SLASH, 2,
-            TokenType.ASTERISK, 2);
+            TokenType.EQ, 1,
+            TokenType.NOT_EQ, 1,
+            TokenType.GT, 2,
+            TokenType.LT, 2,
+            TokenType.PLUS, 3,
+            TokenType.MINUS, 3,
+            TokenType.SLASH, 4,
+            TokenType.ASTERISK, 4);
+    private static final int PREFIX_PRECEDENCE = 5;
 
     public Parser(String input) {
         lexer = new Lexer(input);
@@ -122,7 +132,7 @@ public class Parser {
     private Expression parsePrefixExpression() {
         Prefix retVal = new Prefix(lexer.currentToken());
         lexer.nextToken();
-        retVal.setRight(parseExpression());
+        retVal.setRight(parseExpression(PREFIX_PRECEDENCE));
         return retVal;
     }
 

@@ -83,6 +83,12 @@ public class ParserTest {
                 new String[] { "a + b + c;", "((a + b) + c)" },
                 new String[] { "100 * 2 + 1;", "((100 * 2) + 1)" },
                 new String[] { "a + b * c - d / 2;", "((a + (b * c)) - (d / 2))" },
+                new String[] { "-a * b;", "((-a) * b)" },
+                new String[] { "!-a;", "(!(-a))" },
+                new String[] { "a > b;", "(a > b)" },
+                new String[] { "a < b;", "(a < b)" },
+                new String[] { "a == b + 2;", "(a == (b + 2))" },
+                new String[] { "5 > 2 == 2 > 1;", "((5 > 2) == (2 > 1))" }
         };
         for (String[] test : tests) {
             String input = test[0];
