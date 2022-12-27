@@ -10,6 +10,7 @@ import io.thoqbk.tholangforfun.ast.ExpressionStatement;
 import io.thoqbk.tholangforfun.ast.LetStatement;
 import io.thoqbk.tholangforfun.ast.ReturnStatement;
 import io.thoqbk.tholangforfun.ast.Statement;
+import io.thoqbk.tholangforfun.ast.expressions.Bool;
 import io.thoqbk.tholangforfun.ast.expressions.Expression;
 import io.thoqbk.tholangforfun.ast.expressions.Identifier;
 import io.thoqbk.tholangforfun.ast.expressions.Infix;
@@ -21,6 +22,8 @@ public class Parser {
     private Map<TokenType, Supplier<Expression>> prefixParsers = Map.of(
             TokenType.IDENT, this::parseIdentifier,
             TokenType.INT, this::parseInt,
+            TokenType.TRUE, this::parseBool,
+            TokenType.FALSE, this::parseBool,
             TokenType.MINUS, this::parsePrefixExpression,
             TokenType.BANG, this::parsePrefixExpression);
     private Map<TokenType, Function<Expression, Expression>> infixParsers = Map.of(
@@ -151,6 +154,10 @@ public class Parser {
 
     private Expression parseInt() {
         return new Int(lexer.currentToken());
+    }
+
+    private Expression parseBool() {
+        return new Bool(lexer.currentToken());
     }
 
     private Token assertPeekToken(TokenType type) {

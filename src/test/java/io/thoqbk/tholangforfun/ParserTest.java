@@ -10,6 +10,7 @@ import io.thoqbk.tholangforfun.ast.ExpressionStatement;
 import io.thoqbk.tholangforfun.ast.LetStatement;
 import io.thoqbk.tholangforfun.ast.ReturnStatement;
 import io.thoqbk.tholangforfun.ast.Statement;
+import io.thoqbk.tholangforfun.ast.expressions.Bool;
 import io.thoqbk.tholangforfun.ast.expressions.Infix;
 import io.thoqbk.tholangforfun.ast.expressions.Int;
 import io.thoqbk.tholangforfun.ast.expressions.Prefix;
@@ -98,5 +99,16 @@ public class ParserTest {
             var expression = statements.get(0).as(ExpressionStatement.class).getExpression();
             assertEquals(expected, expression.toString());
         }
+    }
+
+    @Test
+    public void parseExpressionShouldWorkForBooleanValues() {
+        String input = "let foo = true;let bar = false;";
+        List<Statement> statements = new Parser(input).parse();
+        assertEquals(2, statements.size());
+        Bool firstBool = statements.get(0).as(LetStatement.class).getExpression().as(Bool.class);
+        assertEquals(true, firstBool.getValue());
+        Bool secondBool = statements.get(1).as(LetStatement.class).getExpression().as(Bool.class);
+        assertEquals(false, secondBool.getValue());
     }
 }
