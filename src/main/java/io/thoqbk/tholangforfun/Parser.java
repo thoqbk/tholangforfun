@@ -63,7 +63,7 @@ public class Parser {
 
     public List<Statement> parse() {
         List<Statement> retVal = new ArrayList<>();
-        while (lexer.peekToken().getType() != TokenType.EOF) {
+        while (!peekTokenIs(TokenType.EOF)) {
             lexer.nextToken();
             retVal.add(parseStatement());
         }
@@ -193,7 +193,7 @@ public class Parser {
     private Block parseBlockStatement() {
         Block retVal = new Block(lexer.currentToken());
         lexer.nextToken();
-        while (lexer.currentToken().getType() != TokenType.RBRACE) {
+        while (!currentTokenIs(TokenType.RBRACE)) {
             retVal.getStatements().add(parseStatement());
             lexer.nextToken();
         }
@@ -213,7 +213,7 @@ public class Parser {
 
     private List<Identifier> parseFunctionParams() {
         List<Identifier> retVal = new ArrayList<>();
-        while (lexer.currentToken().getType() != TokenType.RPAREN) {
+        while (!currentTokenIs(TokenType.RPAREN)) {
             assertCurrentToken(TokenType.IDENT);
             retVal.add(parseExpression().as(Identifier.class));
             if (peekTokenIs(TokenType.COMMA)) {
@@ -234,7 +234,7 @@ public class Parser {
 
     private List<Expression> parseFunctionCallArgs() {
         List<Expression> retVal = new ArrayList<>();
-        while (lexer.currentToken().getType() != TokenType.RPAREN) {
+        while (!currentTokenIs(TokenType.RPAREN)) {
             retVal.add(parseExpression());
             if (peekTokenIs(TokenType.COMMA)) {
                 lexer.nextToken();
@@ -264,6 +264,10 @@ public class Parser {
 
     private boolean peekTokenIs(TokenType type) {
         return lexer.peekToken().getType() == type;
+    }
+
+    private boolean currentTokenIs(TokenType type) {
+        return lexer.currentToken().getType() == type;
     }
 
     private void assertTokenType(Token token, TokenType tokenType) {
