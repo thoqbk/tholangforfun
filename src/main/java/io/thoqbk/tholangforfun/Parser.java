@@ -3,11 +3,11 @@ package io.thoqbk.tholangforfun;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import io.thoqbk.tholangforfun.ast.expressions.Bool;
 import io.thoqbk.tholangforfun.ast.expressions.Expression;
+import io.thoqbk.tholangforfun.ast.expressions.Function;
 import io.thoqbk.tholangforfun.ast.expressions.Identifier;
 import io.thoqbk.tholangforfun.ast.expressions.Infix;
 import io.thoqbk.tholangforfun.ast.expressions.Int;
@@ -28,8 +28,9 @@ public class Parser {
             TokenType.FALSE, this::parseBool,
             TokenType.MINUS, this::parsePrefixExpression,
             TokenType.BANG, this::parsePrefixExpression,
-            TokenType.LPAREN, this::parseLeftParen);
-    private Map<TokenType, Function<Expression, Expression>> infixParsers = Map.of(
+            TokenType.LPAREN, this::parseLeftParen,
+            TokenType.FUNCTION, this::parseFunction);
+    private Map<TokenType, java.util.function.Function<Expression, Expression>> infixParsers = Map.of(
             TokenType.PLUS, this::parseInfixExpression,
             TokenType.MINUS, this::parseInfixExpression,
             TokenType.SLASH, this::parseInfixExpression,
@@ -194,6 +195,29 @@ public class Parser {
             lexer.nextToken();
         }
         assertTokenType(lexer.currentToken(), TokenType.RBRACE);
+        return retVal;
+    }
+
+    private Expression parseFunction() {
+        Function retVal = new Function(lexer.currentToken());
+        assertPeekTokenThenNext(TokenType.LPAREN);
+        lexer.nextToken();
+        retVal.setParams(parseFunctionParams());
+        assertPeekTokenThenNext(TokenType.LBRACE);
+        retVal.setBody(parseBlockStatement());
+        return retVal;
+    }
+
+    private List<Identifier> parseFunctionParams() {
+        List<Identifier> retVal = new ArrayList<>();
+        while (lexer.currentToken().getType() != TokenType.RPAREN) {
+            assertTokenType(lexer.currentToken(), TokenType.IDENT);
+            retVal.add(parseExpression().as(Identifier.class));
+            if (peekTokenIs(TokenType.COMMA)) {
+                lexer.nextToken();
+            }
+            lexer.nextToken();
+        }
         return retVal;
     }
 

@@ -41,7 +41,7 @@ public enum TokenType {
     RETURN("RETURN");
 
     private static final Map<String, TokenType> KEYWORDS = Map.of(
-            "fn", FUNCTION,
+            "function", FUNCTION,
             "let", LET,
             "true", TRUE,
             "false", FALSE,
