@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.Test;
 
 import io.thoqbk.tholangforfun.ast.expressions.Bool;
+import io.thoqbk.tholangforfun.ast.expressions.Call;
 import io.thoqbk.tholangforfun.ast.expressions.Function;
 import io.thoqbk.tholangforfun.ast.expressions.Infix;
 import io.thoqbk.tholangforfun.ast.expressions.Int;
@@ -154,6 +155,20 @@ public class ParserTest {
         assertEquals("abc", fn.getParams().get(0).getToken().getLiteral());
         assertEquals("xyz", fn.getParams().get(1).getToken().getLiteral());
         assertEquals(2, fn.getBody().getStatements().size());
+    }
+
+    @Test
+    public void parseFunctionCallShouldReturnCallExpressionWithComponents() {
+        String input = """
+                add(1, abc + xyz, 2);
+                """;
+        List<Statement> statements = new Parser(input).parse();
+        assertEquals(1, statements.size());
+        var call = statements.get(0).as(ExpressionStm.class).getExpression().as(Call.class);
+        assertEquals("add", call.getFunctionName());
+        assertEquals(3, call.getArgs().size());
+        assertEquals(1, call.getArgs().get(0).as(Int.class).getValue());
+        assertEquals(2, call.getArgs().get(2).as(Int.class).getValue());
     }
 
     private void testExpressions(String[][] tests) {

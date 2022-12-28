@@ -3,9 +3,11 @@ package io.thoqbk.tholangforfun;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import static java.util.Map.entry;
 import java.util.function.Supplier;
 
 import io.thoqbk.tholangforfun.ast.expressions.Bool;
+import io.thoqbk.tholangforfun.ast.expressions.Call;
 import io.thoqbk.tholangforfun.ast.expressions.Expression;
 import io.thoqbk.tholangforfun.ast.expressions.Function;
 import io.thoqbk.tholangforfun.ast.expressions.Identifier;
@@ -38,19 +40,21 @@ public class Parser {
             TokenType.GT, this::parseInfixExpression,
             TokenType.LT, this::parseInfixExpression,
             TokenType.EQ, this::parseInfixExpression,
-            TokenType.NOT_EQ, this::parseInfixExpression);
+            TokenType.NOT_EQ, this::parseInfixExpression,
+            TokenType.LPAREN, this::parseFunctionCall);
     private static final int LOWEST_PRECEDENCE = 0;
-    private Map<TokenType, Integer> precedences = Map.of(
-            TokenType.RPAREN, LOWEST_PRECEDENCE,
-            TokenType.EOF, LOWEST_PRECEDENCE,
-            TokenType.EQ, 1,
-            TokenType.NOT_EQ, 1,
-            TokenType.GT, 2,
-            TokenType.LT, 2,
-            TokenType.PLUS, 3,
-            TokenType.MINUS, 3,
-            TokenType.SLASH, 4,
-            TokenType.ASTERISK, 4);
+    private Map<TokenType, Integer> precedences = Map.ofEntries(
+            entry(TokenType.RPAREN, LOWEST_PRECEDENCE),
+            entry(TokenType.EOF, LOWEST_PRECEDENCE),
+            entry(TokenType.EQ, 1),
+            entry(TokenType.NOT_EQ, 1),
+            entry(TokenType.GT, 2),
+            entry(TokenType.LT, 2),
+            entry(TokenType.PLUS, 3),
+            entry(TokenType.MINUS, 3),
+            entry(TokenType.SLASH, 4),
+            entry(TokenType.ASTERISK, 4),
+            entry(TokenType.LPAREN, 5));
     private static final int PREFIX_PRECEDENCE = 5;
 
     public Parser(String input) {
@@ -213,6 +217,26 @@ public class Parser {
         while (lexer.currentToken().getType() != TokenType.RPAREN) {
             assertTokenType(lexer.currentToken(), TokenType.IDENT);
             retVal.add(parseExpression().as(Identifier.class));
+            if (peekTokenIs(TokenType.COMMA)) {
+                lexer.nextToken();
+            }
+            lexer.nextToken();
+        }
+        return retVal;
+    }
+
+    private Expression parseFunctionCall(Expression left) {
+        Call retVal = new Call(left.as(Identifier.class).getToken());
+        assertTokenType(lexer.currentToken(), TokenType.LPAREN);
+        lexer.nextToken();
+        retVal.setArgs(parseFunctionCallArgs());
+        return retVal;
+    }
+
+    private List<Expression> parseFunctionCallArgs() {
+        List<Expression> retVal = new ArrayList<>();
+        while (lexer.currentToken().getType() != TokenType.RPAREN) {
+            retVal.add(parseExpression());
             if (peekTokenIs(TokenType.COMMA)) {
                 lexer.nextToken();
             }

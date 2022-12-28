@@ -35,7 +35,7 @@ public class LexerTest {
                 let five = 5;
                 let ten = 10;
 
-                let add = fn(x, y) {
+                let add = function(x, y) {
                   x + y;
                 };
 
@@ -68,7 +68,7 @@ public class LexerTest {
                 new Token(TokenType.LET, "let"),
                 new Token(TokenType.IDENT, "add"),
                 new Token(TokenType.ASSIGN, "="),
-                new Token(TokenType.FUNCTION, "fn"),
+                new Token(TokenType.FUNCTION, "function"),
                 new Token(TokenType.LPAREN, "("),
                 new Token(TokenType.IDENT, "x"),
                 new Token(TokenType.COMMA, ","),
