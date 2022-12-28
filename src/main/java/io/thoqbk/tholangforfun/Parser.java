@@ -90,14 +90,13 @@ public class Parser {
 
     private Statement parseLetStatement() {
         Let retVal = new Let(lexer.currentToken());
-        Token variable = lexer.nextToken();
-        assertTokenType(variable, TokenType.IDENT);
+        Token variable = assertPeekTokenThenNext(TokenType.IDENT);
         retVal.setVariableName(variable.getLiteral());
         assertPeekToken(TokenType.ASSIGN);
         lexer.nextToken();
         lexer.nextToken();
         retVal.setExpression(parseExpression());
-        assertTokenType(lexer.nextToken(), TokenType.SEMICOLON);
+        assertPeekTokenThenNext(TokenType.SEMICOLON);
         return retVal;
     }
 
@@ -105,7 +104,7 @@ public class Parser {
         Return retVal = new Return(lexer.currentToken());
         lexer.nextToken();
         retVal.setValue(parseExpression());
-        assertTokenType(lexer.nextToken(), TokenType.SEMICOLON);
+        assertPeekTokenThenNext(TokenType.SEMICOLON);
         return retVal;
     }
 
@@ -198,7 +197,7 @@ public class Parser {
             retVal.getStatements().add(parseStatement());
             lexer.nextToken();
         }
-        assertTokenType(lexer.currentToken(), TokenType.RBRACE);
+        assertCurrentToken(TokenType.RBRACE);
         return retVal;
     }
 
@@ -215,7 +214,7 @@ public class Parser {
     private List<Identifier> parseFunctionParams() {
         List<Identifier> retVal = new ArrayList<>();
         while (lexer.currentToken().getType() != TokenType.RPAREN) {
-            assertTokenType(lexer.currentToken(), TokenType.IDENT);
+            assertCurrentToken(TokenType.IDENT);
             retVal.add(parseExpression().as(Identifier.class));
             if (peekTokenIs(TokenType.COMMA)) {
                 lexer.nextToken();
@@ -227,7 +226,7 @@ public class Parser {
 
     private Expression parseFunctionCall(Expression left) {
         Call retVal = new Call(left.as(Identifier.class).getToken());
-        assertTokenType(lexer.currentToken(), TokenType.LPAREN);
+        assertCurrentToken(TokenType.LPAREN);
         lexer.nextToken();
         retVal.setArgs(parseFunctionCallArgs());
         return retVal;
@@ -249,6 +248,11 @@ public class Parser {
         Token retVal = lexer.peekToken();
         assertTokenType(retVal, type);
         return retVal;
+    }
+
+    private Token assertCurrentToken(TokenType type) {
+        assertTokenType(lexer.currentToken(), type);
+        return lexer.currentToken();
     }
 
     private Token assertPeekTokenThenNext(TokenType type) {
