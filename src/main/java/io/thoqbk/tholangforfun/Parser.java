@@ -25,7 +25,8 @@ public class Parser {
             TokenType.TRUE, this::parseBool,
             TokenType.FALSE, this::parseBool,
             TokenType.MINUS, this::parsePrefixExpression,
-            TokenType.BANG, this::parsePrefixExpression);
+            TokenType.BANG, this::parsePrefixExpression,
+            TokenType.LPAREN, this::parseLeftParen);
     private Map<TokenType, Function<Expression, Expression>> infixParsers = Map.of(
             TokenType.PLUS, this::parseInfixExpression,
             TokenType.MINUS, this::parseInfixExpression,
@@ -37,6 +38,7 @@ public class Parser {
             TokenType.NOT_EQ, this::parseInfixExpression);
     private static final int LOWEST_PRECEDENCE = 0;
     private Map<TokenType, Integer> precedences = Map.of(
+            TokenType.RPAREN, LOWEST_PRECEDENCE,
             TokenType.EQ, 1,
             TokenType.NOT_EQ, 1,
             TokenType.GT, 2,
@@ -158,6 +160,14 @@ public class Parser {
 
     private Expression parseBool() {
         return new Bool(lexer.currentToken());
+    }
+
+    private Expression parseLeftParen() {
+        lexer.nextToken();
+        var retVal = parseExpression();
+        assertPeekToken(TokenType.RPAREN);
+        lexer.nextToken();
+        return retVal;
     }
 
     private Token assertPeekToken(TokenType type) {
