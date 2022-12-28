@@ -1,12 +1,14 @@
 package io.thoqbk.tholangforfun;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
 import org.junit.Test;
 
 import io.thoqbk.tholangforfun.ast.ExpressionStatement;
+import io.thoqbk.tholangforfun.ast.IfStatement;
 import io.thoqbk.tholangforfun.ast.LetStatement;
 import io.thoqbk.tholangforfun.ast.ReturnStatement;
 import io.thoqbk.tholangforfun.ast.Statement;
@@ -79,7 +81,8 @@ public class ParserTest {
     @Test
     public void parseExpressionShouldConsiderPrecedences() {
         String[][] tests = new String[][] {
-                new String[] { "a + b;", "(a + b)" },
+                new String[] { "a + b", "(a + b)" },
+                new String[] { "a + b;c + d", "(a + b)(c + d)" },
                 new String[] { "a + b / 2;", "(a + (b / 2))" },
                 new String[] { "a + b + c;", "((a + b) + c)" },
                 new String[] { "100 * 2 + 1;", "((100 * 2) + 1)" },
@@ -90,7 +93,7 @@ public class ParserTest {
                 new String[] { "a < b;", "(a < b)" },
                 new String[] { "a == b + 2;", "(a == (b + 2))" },
                 new String[] { "5 > 2 == 2 > 1;", "((5 > 2) == (2 > 1))" },
-                new String[] { "true == !false;", "(true == (!false))" }
+                new String[] { "true == !false;", "(true == (!false))" },
         };
         testExpressions(tests);
     }
@@ -100,6 +103,7 @@ public class ParserTest {
         var tests = new String[][] {
                 new String[] { "(a + b) / 2;", "((a + b) / 2)" },
                 new String[] { "1 + ((a + 1) * 2) / 3 + 3;", "((1 + (((a + 1) * 2) / 3)) + 3)" },
+                new String[] { "a * (a +b);c + d", "(a * (a + b))(c + d)" },
         };
         testExpressions(tests);
     }
@@ -115,14 +119,36 @@ public class ParserTest {
         assertEquals(false, secondBool.getValue());
     }
 
+    @Test
+    public void parseIfStatementShouldReturnAllIfComponents() {
+        String input = """
+                if (x > y) {
+                    return y;
+                } else {
+                    return x;
+                }
+                """;
+        List<Statement> statements = new Parser(input).parse();
+        assertEquals(1, statements.size());
+        var ifStatement = statements.get(0).as(IfStatement.class);
+        assertNotNull(ifStatement.getCondition());
+        assertEquals(1, ifStatement.getIfBody().getStatements().size());
+        assertNotNull(ifStatement.getIfBody().getStatements().get(0).as(ReturnStatement.class));
+        assertEquals(1, ifStatement.getElseBody().getStatements().size());
+        assertNotNull(ifStatement.getElseBody().getStatements().get(0).as(ReturnStatement.class));
+    }
+
     private void testExpressions(String[][] tests) {
         for (String[] test : tests) {
             String input = test[0];
             String expected = test[1];
             List<Statement> statements = new Parser(input).parse();
-            assertEquals(1, statements.size());
-            var expression = statements.get(0).as(ExpressionStatement.class).getExpression();
-            assertEquals(expected, expression.toString());
+            StringBuilder actual = new StringBuilder();
+            for (Statement statement : statements) {
+                var expression = statement.as(ExpressionStatement.class).getExpression();
+                actual.append(expression.toString());
+            }
+            assertEquals(expected, actual.toString());
         }
     }
 }

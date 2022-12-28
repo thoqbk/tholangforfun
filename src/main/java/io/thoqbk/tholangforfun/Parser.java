@@ -6,7 +6,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import io.thoqbk.tholangforfun.ast.BlockStatement;
 import io.thoqbk.tholangforfun.ast.ExpressionStatement;
+import io.thoqbk.tholangforfun.ast.IfStatement;
 import io.thoqbk.tholangforfun.ast.LetStatement;
 import io.thoqbk.tholangforfun.ast.ReturnStatement;
 import io.thoqbk.tholangforfun.ast.Statement;
@@ -39,6 +41,7 @@ public class Parser {
     private static final int LOWEST_PRECEDENCE = 0;
     private Map<TokenType, Integer> precedences = Map.of(
             TokenType.RPAREN, LOWEST_PRECEDENCE,
+            TokenType.EOF, LOWEST_PRECEDENCE,
             TokenType.EQ, 1,
             TokenType.NOT_EQ, 1,
             TokenType.GT, 2,
@@ -55,26 +58,29 @@ public class Parser {
 
     public List<Statement> parse() {
         List<Statement> retVal = new ArrayList<>();
-        while (true) {
-            Token token = lexer.nextToken();
-            if (token.getType() == TokenType.EOF) {
-                break;
-            }
-            switch (token.getType()) {
-                case LET: {
-                    retVal.add(parseLetStatement());
-                    break;
-                }
-                case RETURN: {
-                    retVal.add(parseReturnStatement());
-                    break;
-                }
-                default: {
-                    retVal.add(parseExpressionStatement());
-                }
-            }
+        while (lexer.peekToken().getType() != TokenType.EOF) {
+            lexer.nextToken();
+            retVal.add(parseStatement());
         }
         return retVal;
+    }
+
+    private Statement parseStatement() {
+        Token token = lexer.currentToken();
+        switch (token.getType()) {
+            case LET: {
+                return parseLetStatement();
+            }
+            case RETURN: {
+                return parseReturnStatement();
+            }
+            case IF: {
+                return parseIfStatement();
+            }
+            default: {
+                return parseExpressionStatement();
+            }
+        }
     }
 
     private Statement parseLetStatement() {
@@ -118,17 +124,11 @@ public class Parser {
         }
         Expression left = prefix.get();
         while (true) {
-            if (peekTokenIs(TokenType.SEMICOLON)) {
-                return left;
-            }
-            if (peekPrecedence() <= prevPrecedence) {
+            var infix = infixParsers.get(lexer.peekToken().getType());
+            if (infix == null || peekTokenIs(TokenType.SEMICOLON) || peekPrecedence() <= prevPrecedence) {
                 break;
             }
             lexer.nextToken();
-            var infix = infixParsers.get(lexer.currentToken().getType());
-            if (infix == null) {
-                throw new RuntimeException("Infix parser not found for token '" + lexer.currentToken().getType() + "'");
-            }
             left = infix.apply(left);
         }
         return left;
@@ -170,9 +170,43 @@ public class Parser {
         return retVal;
     }
 
+    private Statement parseIfStatement() {
+        var retVal = new IfStatement(lexer.currentToken());
+        assertPeekTokenThenNext(TokenType.LPAREN);
+        lexer.nextToken();
+        retVal.setCondition(parseExpression());
+        assertPeekTokenThenNext(TokenType.RPAREN);
+        assertPeekTokenThenNext(TokenType.LBRACE);
+        retVal.setIfBody(parseBlockStatement());
+        if (peekTokenIs(TokenType.ELSE)) {
+            lexer.nextToken();
+            lexer.nextToken();
+            retVal.setElseBody(parseBlockStatement());
+        }
+        return retVal;
+    }
+
+    private BlockStatement parseBlockStatement() {
+        BlockStatement retVal = new BlockStatement(lexer.currentToken());
+        lexer.nextToken();
+        while (lexer.currentToken().getType() != TokenType.RBRACE) {
+            retVal.getStatements().add(parseStatement());
+            lexer.nextToken();
+        }
+        assertTokenType(lexer.currentToken(), TokenType.RBRACE);
+        return retVal;
+    }
+
     private Token assertPeekToken(TokenType type) {
         Token retVal = lexer.peekToken();
         assertTokenType(retVal, type);
+        return retVal;
+    }
+
+    private Token assertPeekTokenThenNext(TokenType type) {
+        Token retVal = lexer.peekToken();
+        assertTokenType(retVal, type);
+        lexer.nextToken();
         return retVal;
     }
 
