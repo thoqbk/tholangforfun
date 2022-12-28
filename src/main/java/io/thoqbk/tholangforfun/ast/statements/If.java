@@ -1,14 +1,14 @@
-package io.thoqbk.tholangforfun.ast;
+package io.thoqbk.tholangforfun.ast.statements;
 
 import io.thoqbk.tholangforfun.Token;
 import io.thoqbk.tholangforfun.ast.expressions.Expression;
 
-public class IfStatement extends Statement {
+public class If extends Statement {
     private Expression condition;
-    private BlockStatement ifBody;
-    private BlockStatement elseBody;
+    private Block ifBody;
+    private Block elseBody;
 
-    public IfStatement(Token token) {
+    public If(Token token) {
         super(token);
     }
 
@@ -20,19 +20,19 @@ public class IfStatement extends Statement {
         return condition;
     }
 
-    public void setIfBody(BlockStatement statement) {
+    public void setIfBody(Block statement) {
         ifBody = statement;
     }
 
-    public BlockStatement getIfBody() {
+    public Block getIfBody() {
         return ifBody;
     }
 
-    public void setElseBody(BlockStatement statement) {
+    public void setElseBody(Block statement) {
         elseBody = statement;
     }
 
-    public BlockStatement getElseBody() {
+    public Block getElseBody() {
         return elseBody;
     }
 }

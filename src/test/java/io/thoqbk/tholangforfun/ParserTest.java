@@ -7,15 +7,15 @@ import java.util.List;
 
 import org.junit.Test;
 
-import io.thoqbk.tholangforfun.ast.ExpressionStatement;
-import io.thoqbk.tholangforfun.ast.IfStatement;
-import io.thoqbk.tholangforfun.ast.LetStatement;
-import io.thoqbk.tholangforfun.ast.ReturnStatement;
-import io.thoqbk.tholangforfun.ast.Statement;
 import io.thoqbk.tholangforfun.ast.expressions.Bool;
 import io.thoqbk.tholangforfun.ast.expressions.Infix;
 import io.thoqbk.tholangforfun.ast.expressions.Int;
 import io.thoqbk.tholangforfun.ast.expressions.Prefix;
+import io.thoqbk.tholangforfun.ast.statements.ExpressionStm;
+import io.thoqbk.tholangforfun.ast.statements.If;
+import io.thoqbk.tholangforfun.ast.statements.Let;
+import io.thoqbk.tholangforfun.ast.statements.Return;
+import io.thoqbk.tholangforfun.ast.statements.Statement;
 
 public class ParserTest {
     @Test
@@ -28,10 +28,10 @@ public class ParserTest {
         assertEquals(statements.size(), 2);
         assertEquals(statements.get(0).getToken().getType(), TokenType.LET);
 
-        LetStatement let1 = statements.get(0).as(LetStatement.class);
+        Let let1 = statements.get(0).as(Let.class);
         assertEquals(let1.getVariableName(), "x");
 
-        LetStatement let2 = statements.get(1).as(LetStatement.class);
+        Let let2 = statements.get(1).as(Let.class);
         assertEquals(let2.getVariableName(), "abc");
     }
 
@@ -40,7 +40,7 @@ public class ParserTest {
         String input = "return 10;";
         List<Statement> statements = new Parser(input).parse();
         assertEquals(statements.size(), 1);
-        assertEquals(statements.get(0).as(ReturnStatement.class).getToken().getType(), TokenType.RETURN);
+        assertEquals(statements.get(0).as(Return.class).getToken().getType(), TokenType.RETURN);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class ParserTest {
         String input = "return foobar;";
         List<Statement> statements = new Parser(input).parse();
         assertEquals(statements.size(), 1);
-        ReturnStatement stm = statements.get(0).as(ReturnStatement.class);
+        Return stm = statements.get(0).as(Return.class);
         assertEquals(TokenType.IDENT, stm.getValue().getToken().getType());
         assertEquals("foobar", stm.getValue().getToken().getLiteral());
     }
@@ -58,7 +58,7 @@ public class ParserTest {
         String input = "let abc = -1000;";
         List<Statement> statements = new Parser(input).parse();
         assertEquals(1, statements.size());
-        Prefix prefix = statements.get(0).as(LetStatement.class).getExpression().as(Prefix.class);
+        Prefix prefix = statements.get(0).as(Let.class).getExpression().as(Prefix.class);
         assertEquals(TokenType.MINUS, prefix.getToken().getType());
         Int intExpression = prefix.getRight().as(Int.class);
         assertEquals(1000, intExpression.getValue());
@@ -69,7 +69,7 @@ public class ParserTest {
         String input = "return 100 + 200;";
         List<Statement> statements = new Parser(input).parse();
         assertEquals(1, statements.size());
-        Infix infix = statements.get(0).as(ReturnStatement.class).getValue().as(Infix.class);
+        Infix infix = statements.get(0).as(Return.class).getValue().as(Infix.class);
         assertEquals(TokenType.PLUS, infix.getToken().getType());
 
         Int left = infix.getLeft().as(Int.class);
@@ -113,9 +113,9 @@ public class ParserTest {
         String input = "let foo = true;let bar = false;";
         List<Statement> statements = new Parser(input).parse();
         assertEquals(2, statements.size());
-        Bool firstBool = statements.get(0).as(LetStatement.class).getExpression().as(Bool.class);
+        Bool firstBool = statements.get(0).as(Let.class).getExpression().as(Bool.class);
         assertEquals(true, firstBool.getValue());
-        Bool secondBool = statements.get(1).as(LetStatement.class).getExpression().as(Bool.class);
+        Bool secondBool = statements.get(1).as(Let.class).getExpression().as(Bool.class);
         assertEquals(false, secondBool.getValue());
     }
 
@@ -130,12 +130,12 @@ public class ParserTest {
                 """;
         List<Statement> statements = new Parser(input).parse();
         assertEquals(1, statements.size());
-        var ifStatement = statements.get(0).as(IfStatement.class);
+        var ifStatement = statements.get(0).as(If.class);
         assertNotNull(ifStatement.getCondition());
         assertEquals(1, ifStatement.getIfBody().getStatements().size());
-        assertNotNull(ifStatement.getIfBody().getStatements().get(0).as(ReturnStatement.class));
+        assertNotNull(ifStatement.getIfBody().getStatements().get(0).as(Return.class));
         assertEquals(1, ifStatement.getElseBody().getStatements().size());
-        assertNotNull(ifStatement.getElseBody().getStatements().get(0).as(ReturnStatement.class));
+        assertNotNull(ifStatement.getElseBody().getStatements().get(0).as(Return.class));
     }
 
     private void testExpressions(String[][] tests) {
@@ -145,7 +145,7 @@ public class ParserTest {
             List<Statement> statements = new Parser(input).parse();
             StringBuilder actual = new StringBuilder();
             for (Statement statement : statements) {
-                var expression = statement.as(ExpressionStatement.class).getExpression();
+                var expression = statement.as(ExpressionStm.class).getExpression();
                 actual.append(expression.toString());
             }
             assertEquals(expected, actual.toString());

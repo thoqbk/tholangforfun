@@ -1,14 +1,14 @@
-package io.thoqbk.tholangforfun.ast;
+package io.thoqbk.tholangforfun.ast.statements;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.thoqbk.tholangforfun.Token;
 
-public class BlockStatement extends Statement {
+public class Block extends Statement {
     private List<Statement> statements = new ArrayList<>();
 
-    public BlockStatement(Token token) {
+    public Block(Token token) {
         super(token);
     }
 

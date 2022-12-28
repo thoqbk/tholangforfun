@@ -1,11 +1,11 @@
-package io.thoqbk.tholangforfun.ast;
+package io.thoqbk.tholangforfun.ast.statements;
 
 import io.thoqbk.tholangforfun.ast.expressions.Expression;
 
-public class ExpressionStatement extends Statement {
+public class ExpressionStm extends Statement {
     private final Expression expression;
 
-    public ExpressionStatement(Expression expression) {
+    public ExpressionStm(Expression expression) {
         super(null);
         this.expression = expression;
     }

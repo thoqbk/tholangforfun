@@ -6,18 +6,18 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import io.thoqbk.tholangforfun.ast.BlockStatement;
-import io.thoqbk.tholangforfun.ast.ExpressionStatement;
-import io.thoqbk.tholangforfun.ast.IfStatement;
-import io.thoqbk.tholangforfun.ast.LetStatement;
-import io.thoqbk.tholangforfun.ast.ReturnStatement;
-import io.thoqbk.tholangforfun.ast.Statement;
 import io.thoqbk.tholangforfun.ast.expressions.Bool;
 import io.thoqbk.tholangforfun.ast.expressions.Expression;
 import io.thoqbk.tholangforfun.ast.expressions.Identifier;
 import io.thoqbk.tholangforfun.ast.expressions.Infix;
 import io.thoqbk.tholangforfun.ast.expressions.Int;
 import io.thoqbk.tholangforfun.ast.expressions.Prefix;
+import io.thoqbk.tholangforfun.ast.statements.Block;
+import io.thoqbk.tholangforfun.ast.statements.ExpressionStm;
+import io.thoqbk.tholangforfun.ast.statements.If;
+import io.thoqbk.tholangforfun.ast.statements.Let;
+import io.thoqbk.tholangforfun.ast.statements.Return;
+import io.thoqbk.tholangforfun.ast.statements.Statement;
 
 public class Parser {
     private final Lexer lexer;
@@ -84,7 +84,7 @@ public class Parser {
     }
 
     private Statement parseLetStatement() {
-        LetStatement retVal = new LetStatement(lexer.currentToken());
+        Let retVal = new Let(lexer.currentToken());
         Token variable = lexer.nextToken();
         assertTokenType(variable, TokenType.IDENT);
         retVal.setVariableName(variable.getLiteral());
@@ -97,7 +97,7 @@ public class Parser {
     }
 
     private Statement parseReturnStatement() {
-        ReturnStatement retVal = new ReturnStatement(lexer.currentToken());
+        Return retVal = new Return(lexer.currentToken());
         lexer.nextToken();
         retVal.setValue(parseExpression());
         assertTokenType(lexer.nextToken(), TokenType.SEMICOLON);
@@ -105,7 +105,7 @@ public class Parser {
     }
 
     private Statement parseExpressionStatement() {
-        var retVal = new ExpressionStatement(parseExpression());
+        var retVal = new ExpressionStm(parseExpression());
         if (peekTokenIs(TokenType.SEMICOLON)) {
             lexer.nextToken();
         }
@@ -171,7 +171,7 @@ public class Parser {
     }
 
     private Statement parseIfStatement() {
-        var retVal = new IfStatement(lexer.currentToken());
+        var retVal = new If(lexer.currentToken());
         assertPeekTokenThenNext(TokenType.LPAREN);
         lexer.nextToken();
         retVal.setCondition(parseExpression());
@@ -186,8 +186,8 @@ public class Parser {
         return retVal;
     }
 
-    private BlockStatement parseBlockStatement() {
-        BlockStatement retVal = new BlockStatement(lexer.currentToken());
+    private Block parseBlockStatement() {
+        Block retVal = new Block(lexer.currentToken());
         lexer.nextToken();
         while (lexer.currentToken().getType() != TokenType.RBRACE) {
             retVal.getStatements().add(parseStatement());

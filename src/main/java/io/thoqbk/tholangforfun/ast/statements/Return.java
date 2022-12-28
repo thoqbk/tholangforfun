@@ -1,12 +1,12 @@
-package io.thoqbk.tholangforfun.ast;
+package io.thoqbk.tholangforfun.ast.statements;
 
 import io.thoqbk.tholangforfun.Token;
 import io.thoqbk.tholangforfun.ast.expressions.Expression;
 
-public class ReturnStatement extends Statement {
+public class Return extends Statement {
     private Expression value;
 
-    public ReturnStatement(Token token) {
+    public Return(Token token) {
         super(token);
     }
 

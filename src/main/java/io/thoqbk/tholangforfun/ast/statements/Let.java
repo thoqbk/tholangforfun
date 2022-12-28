@@ -1,13 +1,13 @@
-package io.thoqbk.tholangforfun.ast;
+package io.thoqbk.tholangforfun.ast.statements;
 
 import io.thoqbk.tholangforfun.Token;
 import io.thoqbk.tholangforfun.ast.expressions.Expression;
 
-public class LetStatement extends Statement {
+public class Let extends Statement {
     private String variableName;
     private Expression expression;
 
-    public LetStatement(Token token) {
+    public Let(Token token) {
         super(token);
     }
 
