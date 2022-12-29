@@ -11,9 +11,10 @@ public class EvaluatorTest {
     @Test
     public void evalReturnsResultOfIntExpression() {
         String[][] tests = new String[][] {
-                new String[] {
-                        "5;", "5"
-                },
+                new String[] { "5;", "5" },
+                new String[] { "10", "10" },
+                new String[] { "-5", "-5" },
+                new String[] { "--5", "5" },
         };
         for (String[] test : tests) {
             String input = test[0];
