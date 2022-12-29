@@ -16,4 +16,8 @@ public class Statement {
     public <T extends Statement> T as(Class<T> clazz) {
         return clazz.cast(this);
     }
+
+    public <T extends Statement> boolean is(Class<T> clazz) {
+        return clazz.isInstance(this);
+    }
 }

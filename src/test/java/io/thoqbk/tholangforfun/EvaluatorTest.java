@@ -15,6 +15,17 @@ public class EvaluatorTest {
                 new String[] { "10", "10" },
                 new String[] { "-5", "-5" },
                 new String[] { "--5", "5" },
+                new String[] { "5 + 5 + 5 + 5 - 10", "10" },
+                new String[] { "2 * 2 * 2 * 2 * 2", "32" },
+                new String[] { "-50 + 100 + -50", "0" },
+                new String[] { "5 * 2 + 10", "20" },
+                new String[] { "5 + 2 * 10", "25" },
+                new String[] { "20 + 2 * -10", "0" },
+                new String[] { "50 / 2 * 2 + 10", "60" },
+                new String[] { "2 * (5 + 10)", "30" },
+                new String[] { "3 * 3 * 3 + 10", "37" },
+                new String[] { "3 * (3 * 3) + 10", "37" },
+                new String[] { "(5 + 10 * 2 + 15 / 3) * 2 + -10", "50" },
         };
         for (String[] test : tests) {
             String input = test[0];

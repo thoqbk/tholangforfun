@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.thoqbk.tholangforfun.ast.Program;
 import io.thoqbk.tholangforfun.ast.expressions.Expression;
+import io.thoqbk.tholangforfun.ast.expressions.Infix;
 import io.thoqbk.tholangforfun.ast.expressions.Int;
 import io.thoqbk.tholangforfun.ast.expressions.Prefix;
 import io.thoqbk.tholangforfun.ast.statements.ExpressionStm;
@@ -22,7 +23,7 @@ public class Evaluator {
     }
 
     private EvalResult eval(Statement statement) {
-        if (statement instanceof ExpressionStm) {
+        if (statement.is(ExpressionStm.class)) {
             return eval(statement.as(ExpressionStm.class));
         }
         return null;
@@ -33,10 +34,12 @@ public class Evaluator {
     }
 
     private EvalResult eval(Expression expression) {
-        if (expression instanceof Int) {
+        if (expression.is(Int.class)) {
             return new IntResult(expression.as(Int.class).getValue());
-        } else if (expression instanceof Prefix) {
+        } else if (expression.is(Prefix.class)) {
             return eval(expression.as(Prefix.class));
+        } else if (expression.is(Infix.class)) {
+            return eval(expression.as(Infix.class));
         }
         return null;
     }
@@ -46,6 +49,32 @@ public class Evaluator {
         switch (prefix.getToken().getType()) {
             case MINUS: {
                 return new IntResult(-base.as(IntResult.class).getValue());
+            }
+            default: {
+                return null;
+            }
+        }
+    }
+
+    private EvalResult eval(Infix infix) {
+        EvalResult left = eval(infix.getLeft());
+        EvalResult right = eval(infix.getRight());
+        switch (infix.getToken().getType()) {
+            case PLUS: {
+                return new IntResult(
+                        left.as(IntResult.class).getValue() + right.as(IntResult.class).getValue());
+            }
+            case MINUS: {
+                return new IntResult(
+                        left.as(IntResult.class).getValue() - right.as(IntResult.class).getValue());
+            }
+            case ASTERISK: {
+                return new IntResult(
+                        left.as(IntResult.class).getValue() * right.as(IntResult.class).getValue());
+            }
+            case SLASH: {
+                return new IntResult(
+                        left.as(IntResult.class).getValue() / right.as(IntResult.class).getValue());
             }
             default: {
                 return null;

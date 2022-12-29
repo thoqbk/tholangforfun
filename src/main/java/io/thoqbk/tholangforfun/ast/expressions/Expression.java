@@ -17,4 +17,8 @@ public abstract class Expression {
     public <T extends Expression> T as(Class<T> clazz) {
         return clazz.cast(this);
     }
+
+    public <T extends Expression> boolean is(Class<T> clazz) {
+        return clazz.isInstance(this);
+    }
 }
