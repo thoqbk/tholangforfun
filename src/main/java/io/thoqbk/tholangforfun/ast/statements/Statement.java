@@ -14,9 +14,6 @@ public class Statement {
     }
 
     public <T extends Statement> T as(Class<T> clazz) {
-        if (!clazz.isInstance(this)) {
-            throw new RuntimeException("Invalid class. Expected " + clazz.getName() + " was " + this.getClass().getName());
-        }
         return clazz.cast(this);
     }
 }

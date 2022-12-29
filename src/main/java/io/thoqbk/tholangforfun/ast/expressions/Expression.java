@@ -15,10 +15,6 @@ public abstract class Expression {
     }
 
     public <T extends Expression> T as(Class<T> clazz) {
-        if (!clazz.isInstance(this)) {
-            throw new RuntimeException(
-                    "Expected " + clazz.getName() + ", received " + this.getClass().getName() + " instead");
-        }
         return clazz.cast(this);
     }
 }
