@@ -66,4 +66,22 @@ public class EvaluatorTest {
             assertEquals(expected, new Evaluator().eval(p).as(BoolResult.class).getValue());
         }
     }
+
+    @Test
+    public void evalBangOperatorShouldReturnCorrectResult() {
+        String[][] tests = new String[][] {
+                new String[] { "!true", "false" },
+                new String[] { "!false", "true" },
+                new String[] { "!5", "false" },
+                new String[] { "!!true", "true" },
+                new String[] { "!!false", "false" },
+                new String[] { "!!5", "true" },
+        };
+        for (String[] test : tests) {
+            String input = test[0];
+            boolean expected = Boolean.parseBoolean(test[1]);
+            Program p = new Parser(input).parse();
+            assertEquals(expected, new Evaluator().eval(p).as(BoolResult.class).getValue());
+        }
+    }
 }

@@ -54,6 +54,13 @@ public class Evaluator {
             case MINUS: {
                 return new IntResult(-base.as(IntResult.class).getValue());
             }
+            case BANG: {
+                boolean truthyIntCase = base != null && base.is(IntResult.class)
+                        && base.as(IntResult.class).getValue() == 0;
+                boolean truthyBoolCase = base != null && base.is(BoolResult.class)
+                        && !base.as(BoolResult.class).getValue();
+                return new BoolResult(base == null || truthyIntCase || truthyBoolCase);
+            }
             default: {
                 return null;
             }
