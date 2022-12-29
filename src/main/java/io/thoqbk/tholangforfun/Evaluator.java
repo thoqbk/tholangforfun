@@ -3,12 +3,14 @@ package io.thoqbk.tholangforfun;
 import java.util.List;
 
 import io.thoqbk.tholangforfun.ast.Program;
+import io.thoqbk.tholangforfun.ast.expressions.Bool;
 import io.thoqbk.tholangforfun.ast.expressions.Expression;
 import io.thoqbk.tholangforfun.ast.expressions.Infix;
 import io.thoqbk.tholangforfun.ast.expressions.Int;
 import io.thoqbk.tholangforfun.ast.expressions.Prefix;
 import io.thoqbk.tholangforfun.ast.statements.ExpressionStm;
 import io.thoqbk.tholangforfun.ast.statements.Statement;
+import io.thoqbk.tholangforfun.eval.BoolResult;
 import io.thoqbk.tholangforfun.eval.EvalResult;
 import io.thoqbk.tholangforfun.eval.IntResult;
 
@@ -36,6 +38,8 @@ public class Evaluator {
     private EvalResult eval(Expression expression) {
         if (expression.is(Int.class)) {
             return new IntResult(expression.as(Int.class).getValue());
+        } else if (expression.is(Bool.class)) {
+            return new BoolResult(expression.as(Bool.class).getValue());
         } else if (expression.is(Prefix.class)) {
             return eval(expression.as(Prefix.class));
         } else if (expression.is(Infix.class)) {
@@ -76,9 +80,29 @@ public class Evaluator {
                 return new IntResult(
                         left.as(IntResult.class).getValue() / right.as(IntResult.class).getValue());
             }
+            case GT: {
+                return new BoolResult(left.as(IntResult.class).getValue() > right.as(IntResult.class).getValue());
+            }
+            case LT: {
+                return new BoolResult(left.as(IntResult.class).getValue() < right.as(IntResult.class).getValue());
+            }
+            case EQ: {
+                return evalEqual(left, right);
+            }
+            case NOT_EQ: {
+                return new BoolResult(!evalEqual(left, right).as(BoolResult.class).getValue());
+            }
             default: {
                 return null;
             }
         }
+    }
+
+    private EvalResult evalEqual(EvalResult left, EvalResult right) {
+        boolean intCase = left.is(IntResult.class) && right.is(IntResult.class)
+                && left.as(IntResult.class).getValue() == right.as(IntResult.class).getValue();
+        boolean boolCase = left.is(BoolResult.class) && right.is(BoolResult.class)
+                && left.as(BoolResult.class).getValue() == right.as(BoolResult.class).getValue();
+        return new BoolResult(intCase || boolCase);
     }
 }

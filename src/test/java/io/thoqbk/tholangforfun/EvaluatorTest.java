@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import io.thoqbk.tholangforfun.ast.Program;
+import io.thoqbk.tholangforfun.eval.BoolResult;
 import io.thoqbk.tholangforfun.eval.IntResult;
 
 public class EvaluatorTest {
@@ -32,6 +33,37 @@ public class EvaluatorTest {
             int expected = Integer.parseInt(test[1]);
             Program p = new Parser(input).parse();
             assertEquals(expected, new Evaluator().eval(p).as(IntResult.class).getValue());
+        }
+    }
+
+    @Test
+    public void evalReturnsResultOfBoolExpression() {
+        String[][] tests = new String[][] {
+                new String[] { "true", "true" },
+                new String[] { "false", "false" },
+                new String[] { "1 < 2", "true" },
+                new String[] { "1 > 2", "false" },
+                new String[] { "1 < 1", "false" },
+                new String[] { "1 > 1", "false" },
+                new String[] { "1 == 1", "true" },
+                new String[] { "1 != 1", "false" },
+                new String[] { "1 == 2", "false" },
+                new String[] { "1 != 2", "true" },
+                new String[] { "true == true", "true" },
+                new String[] { "false == false", "true" },
+                new String[] { "true == false", "false" },
+                new String[] { "true != false", "true" },
+                new String[] { "false != true", "true" },
+                new String[] { "(1 < 2) == true", "true" },
+                new String[] { "(1 < 2) == false", "false" },
+                new String[] { "(1 > 2) == true", "false" },
+                new String[] { "(1 > 2) == false", "true" },
+        };
+        for (String[] test : tests) {
+            String input = test[0];
+            boolean expected = Boolean.parseBoolean(test[1]);
+            Program p = new Parser(input).parse();
+            assertEquals(expected, new Evaluator().eval(p).as(BoolResult.class).getValue());
         }
     }
 }
