@@ -26,7 +26,7 @@ public class ParserTest {
                 let x = 1;
                 let abc = 10000;
                 """;
-        List<Statement> statements = new Parser(input).parse();
+        List<Statement> statements = new Parser(input).parse().getStatements();
         assertEquals(statements.size(), 2);
         assertEquals(statements.get(0).getToken().getType(), TokenType.LET);
 
@@ -40,7 +40,7 @@ public class ParserTest {
     @Test
     public void parseReturnStatementShouldReturnCorrectToken() {
         String input = "return 10;";
-        List<Statement> statements = new Parser(input).parse();
+        List<Statement> statements = new Parser(input).parse().getStatements();
         assertEquals(statements.size(), 1);
         assertEquals(statements.get(0).as(Return.class).getToken().getType(), TokenType.RETURN);
     }
@@ -48,7 +48,7 @@ public class ParserTest {
     @Test
     public void parseExpressionShouldReturnCorrectIdentifier() {
         String input = "return foobar;";
-        List<Statement> statements = new Parser(input).parse();
+        List<Statement> statements = new Parser(input).parse().getStatements();
         assertEquals(statements.size(), 1);
         Return stm = statements.get(0).as(Return.class);
         assertEquals(TokenType.IDENT, stm.getValue().getToken().getType());
@@ -58,7 +58,7 @@ public class ParserTest {
     @Test
     public void parsePrefixMinusShouldReturnPrefixExpression() {
         String input = "let abc = -1000;";
-        List<Statement> statements = new Parser(input).parse();
+        List<Statement> statements = new Parser(input).parse().getStatements();
         assertEquals(1, statements.size());
         Prefix prefix = statements.get(0).as(Let.class).getExpression().as(Prefix.class);
         assertEquals(TokenType.MINUS, prefix.getToken().getType());
@@ -69,7 +69,7 @@ public class ParserTest {
     @Test
     public void parseInfixShouldReturnLeftAndRight() {
         String input = "return 100 + 200;";
-        List<Statement> statements = new Parser(input).parse();
+        List<Statement> statements = new Parser(input).parse().getStatements();
         assertEquals(1, statements.size());
         Infix infix = statements.get(0).as(Return.class).getValue().as(Infix.class);
         assertEquals(TokenType.PLUS, infix.getToken().getType());
@@ -113,7 +113,7 @@ public class ParserTest {
     @Test
     public void parseExpressionShouldWorkForBooleanValues() {
         String input = "let foo = true;let bar = false;";
-        List<Statement> statements = new Parser(input).parse();
+        List<Statement> statements = new Parser(input).parse().getStatements();
         assertEquals(2, statements.size());
         Bool firstBool = statements.get(0).as(Let.class).getExpression().as(Bool.class);
         assertEquals(true, firstBool.getValue());
@@ -130,7 +130,7 @@ public class ParserTest {
                     return x;
                 }
                 """;
-        List<Statement> statements = new Parser(input).parse();
+        List<Statement> statements = new Parser(input).parse().getStatements();
         assertEquals(1, statements.size());
         var ifStatement = statements.get(0).as(If.class);
         assertNotNull(ifStatement.getCondition());
@@ -148,7 +148,7 @@ public class ParserTest {
                     return abc + xyz + x;
                 }
                 """;
-        List<Statement> statements = new Parser(input).parse();
+        List<Statement> statements = new Parser(input).parse().getStatements();
         assertEquals(1, statements.size());
         var fn = statements.get(0).as(ExpressionStm.class).getExpression().as(Function.class);
         assertEquals(2, fn.getParams().size());
@@ -162,7 +162,7 @@ public class ParserTest {
         String input = """
                 add(1, abc + xyz, 2);
                 """;
-        List<Statement> statements = new Parser(input).parse();
+        List<Statement> statements = new Parser(input).parse().getStatements();
         assertEquals(1, statements.size());
         var call = statements.get(0).as(ExpressionStm.class).getExpression().as(Call.class);
         assertEquals("add", call.getFunctionName());
@@ -175,7 +175,7 @@ public class ParserTest {
         for (String[] test : tests) {
             String input = test[0];
             String expected = test[1];
-            List<Statement> statements = new Parser(input).parse();
+            List<Statement> statements = new Parser(input).parse().getStatements();
             StringBuilder actual = new StringBuilder();
             for (Statement statement : statements) {
                 var expression = statement.as(ExpressionStm.class).getExpression();

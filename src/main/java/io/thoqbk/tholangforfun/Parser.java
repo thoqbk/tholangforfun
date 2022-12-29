@@ -6,6 +6,7 @@ import java.util.Map;
 import static java.util.Map.entry;
 import java.util.function.Supplier;
 
+import io.thoqbk.tholangforfun.ast.Program;
 import io.thoqbk.tholangforfun.ast.expressions.Bool;
 import io.thoqbk.tholangforfun.ast.expressions.Call;
 import io.thoqbk.tholangforfun.ast.expressions.Expression;
@@ -61,12 +62,14 @@ public class Parser {
         lexer = new Lexer(input);
     }
 
-    public List<Statement> parse() {
-        List<Statement> retVal = new ArrayList<>();
+    public Program parse() {
+        List<Statement> statements = new ArrayList<>();
         while (!peekTokenIs(TokenType.EOF)) {
             lexer.nextToken();
-            retVal.add(parseStatement());
+            statements.add(parseStatement());
         }
+        Program retVal = new Program();
+        retVal.setStatments(statements);
         return retVal;
     }
 
