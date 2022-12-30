@@ -17,14 +17,18 @@ import io.thoqbk.tholangforfun.eval.BoolResult;
 import io.thoqbk.tholangforfun.eval.EvalResult;
 import io.thoqbk.tholangforfun.eval.IntResult;
 import io.thoqbk.tholangforfun.eval.NullResult;
+import io.thoqbk.tholangforfun.eval.ReturnResult;
 import io.thoqbk.tholangforfun.exceptions.EvalException;
 
 public class Evaluator {
     public EvalResult eval(Program program) {
         List<Statement> statements = program.getStatements();
-        EvalResult retVal = null;
+        EvalResult retVal = new NullResult();
         for (Statement statement : statements) {
             retVal = eval(statement);
+            if (retVal.is(ReturnResult.class)) {
+                break;
+            }
         }
         return retVal;
     }
@@ -36,6 +40,8 @@ public class Evaluator {
             return eval(statement.as(If.class));
         } else if (statement.is(Block.class)) {
             return eval(statement.as(Block.class));
+        } else if (statement.is(Return.class)) {
+            return eval(statement.as(Return.class));
         }
         throw new EvalException("Unknown statement " + statement);
     }
@@ -55,14 +61,16 @@ public class Evaluator {
         }
         for (Statement stm : block.getStatements()) {
             EvalResult result = eval(stm);
-            if (stm.is(ExpressionStm.class)) {
-                retVal = result;
-            } else if (stm.is(Return.class)) {
-                retVal = result;
+            retVal = result;
+            if (result.is(ReturnResult.class)) {
                 break;
             }
         }
         return retVal;
+    }
+
+    private EvalResult eval(Return returnStm) {
+        return new ReturnResult(eval(returnStm.getValue()));
     }
 
     private EvalResult eval(Expression expression) {
