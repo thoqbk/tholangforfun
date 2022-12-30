@@ -14,10 +14,10 @@ import io.thoqbk.tholangforfun.ast.statements.If;
 import io.thoqbk.tholangforfun.ast.statements.Return;
 import io.thoqbk.tholangforfun.ast.statements.Statement;
 import io.thoqbk.tholangforfun.eval.BoolResult;
-import io.thoqbk.tholangforfun.eval.EvalException;
 import io.thoqbk.tholangforfun.eval.EvalResult;
 import io.thoqbk.tholangforfun.eval.IntResult;
 import io.thoqbk.tholangforfun.eval.NullResult;
+import io.thoqbk.tholangforfun.exceptions.EvalException;
 
 public class Evaluator {
     public EvalResult eval(Program program) {

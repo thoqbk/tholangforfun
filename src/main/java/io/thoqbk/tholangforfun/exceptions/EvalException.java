@@ -1,4 +1,4 @@
-package io.thoqbk.tholangforfun.eval;
+package io.thoqbk.tholangforfun.exceptions;
 
 public class EvalException extends RuntimeException {
     public EvalException(String message) {

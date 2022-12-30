@@ -21,6 +21,7 @@ import io.thoqbk.tholangforfun.ast.statements.If;
 import io.thoqbk.tholangforfun.ast.statements.Let;
 import io.thoqbk.tholangforfun.ast.statements.Return;
 import io.thoqbk.tholangforfun.ast.statements.Statement;
+import io.thoqbk.tholangforfun.exceptions.ParserException;
 
 public class Parser {
     private final Lexer lexer;
@@ -127,7 +128,7 @@ public class Parser {
         Token token = lexer.currentToken();
         Supplier<Expression> prefix = prefixParsers.get(token.getType());
         if (prefix == null) {
-            throw new RuntimeException("Prefix parser not found for token '" + token.getType() + "'");
+            throw new ParserException("Prefix parser not found for token '" + token.getType() + "'");
         }
         Expression left = prefix.get();
         while (true) {
@@ -275,7 +276,7 @@ public class Parser {
 
     private void assertTokenType(Token token, TokenType tokenType) {
         if (token.getType() != tokenType) {
-            throw new RuntimeException(
+            throw new ParserException(
                     "Expect token to be \'" + tokenType + "\', received \'" + token.getType() + "\' instead");
         }
     }
@@ -292,7 +293,7 @@ public class Parser {
 
     private int precedence(TokenType type) {
         if (!precedences.containsKey(type)) {
-            throw new RuntimeException("Precedence not found for token '" + type + "'");
+            throw new ParserException("Precedence not found for token '" + type + "'");
         }
         return precedences.get(type);
     }
