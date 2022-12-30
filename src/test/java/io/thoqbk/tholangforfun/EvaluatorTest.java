@@ -6,7 +6,9 @@ import org.junit.Test;
 
 import io.thoqbk.tholangforfun.ast.Program;
 import io.thoqbk.tholangforfun.eval.BoolResult;
+import io.thoqbk.tholangforfun.eval.EvalResult;
 import io.thoqbk.tholangforfun.eval.IntResult;
+import io.thoqbk.tholangforfun.eval.NullResult;
 
 public class EvaluatorTest {
     @Test
@@ -82,6 +84,30 @@ public class EvaluatorTest {
             boolean expected = Boolean.parseBoolean(test[1]);
             Program p = new Parser(input).parse();
             assertEquals(expected, new Evaluator().eval(p).as(BoolResult.class).getValue());
+        }
+    }
+
+    @Test
+    public void evalIfElseExpression() {
+        String[][] tests = new String[][] {
+                new String[] { "if (true) { 10 }", "10" },
+                new String[] { "if (false) { 10 }", null },
+                new String[] { "if (1) { 10 }", "10" },
+                new String[] { "if (1 < 2) { 10 }", "10" },
+                new String[] { "if (1 > 2) { 10 }", null },
+                new String[] { "if (1 > 2) { 10 } else { 20 }", "20" },
+                new String[] { "if (1 < 2) { 10 } else { 20 }", "10" },
+        };
+        for (String[] test : tests) {
+            String input = test[0];
+            Integer expected = test[1] == null ? null : Integer.parseInt(test[1]);
+            Program p = new Parser(input).parse();
+            EvalResult result = new Evaluator().eval(p);
+            if (expected == null) {
+                result.as(NullResult.class);
+            } else {
+                assertEquals(expected.intValue(), result.as(IntResult.class).getValue());
+            }
         }
     }
 }
