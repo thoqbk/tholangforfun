@@ -155,4 +155,42 @@ public class EvaluatorTest {
             assertEquals(expected, new Evaluator().eval(p).as(IntResult.class).getValue());
         }
     }
+
+    @Test
+    public void evalFunctionCall() {
+        String[][] tests = new String[][] {
+                new String[] {
+                        """
+                                let f = function(x) {
+                                  return x;
+                                  x + 10;
+                                };
+                                f(10);""",
+                        "10",
+                },
+                new String[] {
+                        """
+
+
+                                let f = function(x) {
+                                   let result = x + 10;
+                                   return result;
+                                   return 10;
+                                };
+                                f(10);""",
+                        "20",
+                },
+                new String[] { "let identity = function(x) { x; }; identity(5);", "5" },
+                new String[] { "let identity = function(x) { return x; }; identity(5);", "5" },
+                new String[] { "let double = function(x) { x * 2; }; double(5);", "10" },
+                new String[] { "let add = function(x, y) { x + y; }; add(5, 5);", "10" },
+                new String[] { "let add = function(x, y) { x + y; }; add(5 + 5, add(5, 5));", "20" },
+        };
+        for (String[] test : tests) {
+            String input = test[0];
+            int expected = Integer.parseInt(test[1]);
+            Program p = new Parser(input).parse();
+            assertEquals(expected, new Evaluator().eval(p).as(IntResult.class).getValue());
+        }
+    }
 }

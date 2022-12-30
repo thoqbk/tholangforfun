@@ -4,7 +4,9 @@ import java.util.List;
 
 import io.thoqbk.tholangforfun.ast.Program;
 import io.thoqbk.tholangforfun.ast.expressions.Bool;
+import io.thoqbk.tholangforfun.ast.expressions.Call;
 import io.thoqbk.tholangforfun.ast.expressions.Expression;
+import io.thoqbk.tholangforfun.ast.expressions.Function;
 import io.thoqbk.tholangforfun.ast.expressions.Identifier;
 import io.thoqbk.tholangforfun.ast.expressions.Infix;
 import io.thoqbk.tholangforfun.ast.expressions.Int;
@@ -18,6 +20,7 @@ import io.thoqbk.tholangforfun.ast.statements.Statement;
 import io.thoqbk.tholangforfun.eval.BoolResult;
 import io.thoqbk.tholangforfun.eval.Env;
 import io.thoqbk.tholangforfun.eval.EvalResult;
+import io.thoqbk.tholangforfun.eval.FunctionResult;
 import io.thoqbk.tholangforfun.eval.IntResult;
 import io.thoqbk.tholangforfun.eval.NoResult;
 import io.thoqbk.tholangforfun.eval.NullResult;
@@ -47,21 +50,19 @@ public class Evaluator {
 
     private EvalResult eval(Statement statement, Env env) {
         if (statement.is(ExpressionStm.class)) {
-            return eval(statement.as(ExpressionStm.class), env);
+            return eval(statement.as(ExpressionStm.class).getExpression(), env);
         } else if (statement.is(If.class)) {
             return eval(statement.as(If.class), env);
         } else if (statement.is(Block.class)) {
             return eval(statement.as(Block.class), env);
         } else if (statement.is(Return.class)) {
-            return eval(statement.as(Return.class), env);
+            return new ReturnResult(eval(statement.as(Return.class).getValue(), env));
         } else if (statement.is(Let.class)) {
-            return eval(statement.as(Let.class), env);
+            Let letStm = statement.as(Let.class);
+            env.setVariable(letStm.getVariableName(), eval(letStm.getExpression(), env));
+            return NO_RESULT;
         }
         throw new EvalException("Unknown statement " + statement);
-    }
-
-    private EvalResult eval(ExpressionStm expressionStm, Env env) {
-        return eval(expressionStm.getExpression(), env);
     }
 
     private EvalResult eval(If ifStm, Env env) {
@@ -87,15 +88,6 @@ public class Evaluator {
         return retVal;
     }
 
-    private EvalResult eval(Return returnStm, Env env) {
-        return new ReturnResult(eval(returnStm.getValue(), env));
-    }
-
-    private EvalResult eval(Let letStm, Env env) {
-        env.setVariable(letStm.getVariableName(), eval(letStm.getExpression(), env));
-        return NO_RESULT;
-    }
-
     private EvalResult eval(Expression expression, Env env) {
         if (expression.is(Int.class)) {
             return new IntResult(expression.as(Int.class).getValue());
@@ -107,6 +99,12 @@ public class Evaluator {
             return eval(expression.as(Infix.class), env);
         } else if (expression.is(Identifier.class)) {
             return env.getVariable(expression.as(Identifier.class).getToken().getLiteral());
+        } else if (expression.is(Function.class)) {
+            Function fn = expression.as(Function.class);
+            return new FunctionResult(fn.getParams().stream().map(param -> param.getToken().getLiteral()).toList(),
+                    fn.getBody());
+        } else if (expression.is(Call.class)) {
+            return evalFunctionCall(expression.as(Call.class), env);
         }
         throw new EvalException("Unknown expression " + expression);
     }
@@ -166,6 +164,21 @@ public class Evaluator {
                 throw new EvalException("Invalid infix operator '" + infix.getToken().getType() + "'");
             }
         }
+    }
+
+    private EvalResult evalFunctionCall(Call call, Env parent) {
+        Env env = new Env(parent);
+        FunctionResult fn = env.getVariable(call.getFunctionName()).as(FunctionResult.class);
+        for (int idx = 0; idx < fn.getParams().size(); idx++) {
+            String paramName = fn.getParams().get(idx);
+            EvalResult value = call.getArgs().size() > idx ? eval(call.getArgs().get(idx), env) : NULL_RESULT;
+            env.setVariable(paramName, value);
+        }
+        EvalResult retVal = eval(fn.getBody(), env);
+        if (retVal.is(ReturnResult.class)) {
+            return retVal.as(ReturnResult.class).getValue();
+        }
+        return retVal;
     }
 
     private EvalResult evalEqual(EvalResult left, EvalResult right) {
