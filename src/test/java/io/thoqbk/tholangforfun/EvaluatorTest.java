@@ -139,4 +139,20 @@ public class EvaluatorTest {
                     new Evaluator().eval(p).as(ReturnResult.class).getValue().as(IntResult.class).getValue());
         }
     }
+
+    @Test
+    public void evalIfStatement() {
+        String[][] tests = new String[][] {
+                new String[] { "let a = 5; a;", "5" },
+                new String[] { "let a = 5 * 5; a;", "25" },
+                new String[] { "let a = 5; let b = a; b;", "5" },
+                new String[] { "let a = 5; let b = a; let c = a + b + 5; c;", "15" },
+        };
+        for (String[] test : tests) {
+            String input = test[0];
+            int expected = Integer.parseInt(test[1]);
+            Program p = new Parser(input).parse();
+            assertEquals(expected, new Evaluator().eval(p).as(IntResult.class).getValue());
+        }
+    }
 }

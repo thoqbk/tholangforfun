@@ -5,27 +5,39 @@ import java.util.List;
 import io.thoqbk.tholangforfun.ast.Program;
 import io.thoqbk.tholangforfun.ast.expressions.Bool;
 import io.thoqbk.tholangforfun.ast.expressions.Expression;
+import io.thoqbk.tholangforfun.ast.expressions.Identifier;
 import io.thoqbk.tholangforfun.ast.expressions.Infix;
 import io.thoqbk.tholangforfun.ast.expressions.Int;
 import io.thoqbk.tholangforfun.ast.expressions.Prefix;
 import io.thoqbk.tholangforfun.ast.statements.Block;
 import io.thoqbk.tholangforfun.ast.statements.ExpressionStm;
 import io.thoqbk.tholangforfun.ast.statements.If;
+import io.thoqbk.tholangforfun.ast.statements.Let;
 import io.thoqbk.tholangforfun.ast.statements.Return;
 import io.thoqbk.tholangforfun.ast.statements.Statement;
 import io.thoqbk.tholangforfun.eval.BoolResult;
+import io.thoqbk.tholangforfun.eval.Env;
 import io.thoqbk.tholangforfun.eval.EvalResult;
 import io.thoqbk.tholangforfun.eval.IntResult;
+import io.thoqbk.tholangforfun.eval.NoResult;
 import io.thoqbk.tholangforfun.eval.NullResult;
 import io.thoqbk.tholangforfun.eval.ReturnResult;
 import io.thoqbk.tholangforfun.exceptions.EvalException;
 
 public class Evaluator {
+    private static final EvalResult NULL_RESULT = new NullResult();
+    private static final EvalResult NO_RESULT = new NoResult();
+
     public EvalResult eval(Program program) {
         List<Statement> statements = program.getStatements();
-        EvalResult retVal = new NullResult();
+        EvalResult retVal = NULL_RESULT;
+        Env env = new Env();
         for (Statement statement : statements) {
-            retVal = eval(statement);
+            EvalResult result = eval(statement, env);
+            if (result.is(NoResult.class)) {
+                continue;
+            }
+            retVal = result;
             if (retVal.is(ReturnResult.class)) {
                 break;
             }
@@ -33,34 +45,40 @@ public class Evaluator {
         return retVal;
     }
 
-    private EvalResult eval(Statement statement) {
+    private EvalResult eval(Statement statement, Env env) {
         if (statement.is(ExpressionStm.class)) {
-            return eval(statement.as(ExpressionStm.class));
+            return eval(statement.as(ExpressionStm.class), env);
         } else if (statement.is(If.class)) {
-            return eval(statement.as(If.class));
+            return eval(statement.as(If.class), env);
         } else if (statement.is(Block.class)) {
-            return eval(statement.as(Block.class));
+            return eval(statement.as(Block.class), env);
         } else if (statement.is(Return.class)) {
-            return eval(statement.as(Return.class));
+            return eval(statement.as(Return.class), env);
+        } else if (statement.is(Let.class)) {
+            return eval(statement.as(Let.class), env);
         }
         throw new EvalException("Unknown statement " + statement);
     }
 
-    private EvalResult eval(ExpressionStm expressionStm) {
-        return eval(expressionStm.getExpression());
+    private EvalResult eval(ExpressionStm expressionStm, Env env) {
+        return eval(expressionStm.getExpression(), env);
     }
 
-    private EvalResult eval(If ifStm) {
-        return isTruthy(eval(ifStm.getCondition())) ? eval(ifStm.getIfBody()) : eval(ifStm.getElseBody());
+    private EvalResult eval(If ifStm, Env env) {
+        return isTruthy(eval(ifStm.getCondition(), env)) ? eval(ifStm.getIfBody(), env)
+                : eval(ifStm.getElseBody(), env);
     }
 
-    private EvalResult eval(Block block) {
-        EvalResult retVal = new NullResult();
+    private EvalResult eval(Block block, Env env) {
+        EvalResult retVal = NULL_RESULT;
         if (block == null) {
             return retVal;
         }
         for (Statement stm : block.getStatements()) {
-            EvalResult result = eval(stm);
+            EvalResult result = eval(stm, env);
+            if (result.is(NoResult.class)) {
+                continue;
+            }
             retVal = result;
             if (result.is(ReturnResult.class)) {
                 break;
@@ -69,25 +87,32 @@ public class Evaluator {
         return retVal;
     }
 
-    private EvalResult eval(Return returnStm) {
-        return new ReturnResult(eval(returnStm.getValue()));
+    private EvalResult eval(Return returnStm, Env env) {
+        return new ReturnResult(eval(returnStm.getValue(), env));
     }
 
-    private EvalResult eval(Expression expression) {
+    private EvalResult eval(Let letStm, Env env) {
+        env.setVariable(letStm.getVariableName(), eval(letStm.getExpression(), env));
+        return NO_RESULT;
+    }
+
+    private EvalResult eval(Expression expression, Env env) {
         if (expression.is(Int.class)) {
             return new IntResult(expression.as(Int.class).getValue());
         } else if (expression.is(Bool.class)) {
             return new BoolResult(expression.as(Bool.class).getValue());
         } else if (expression.is(Prefix.class)) {
-            return eval(expression.as(Prefix.class));
+            return eval(expression.as(Prefix.class), env);
         } else if (expression.is(Infix.class)) {
-            return eval(expression.as(Infix.class));
+            return eval(expression.as(Infix.class), env);
+        } else if (expression.is(Identifier.class)) {
+            return env.getVariable(expression.as(Identifier.class).getToken().getLiteral());
         }
         throw new EvalException("Unknown expression " + expression);
     }
 
-    private EvalResult eval(Prefix prefix) {
-        EvalResult base = eval(prefix.getRight());
+    private EvalResult eval(Prefix prefix, Env env) {
+        EvalResult base = eval(prefix.getRight(), env);
         switch (prefix.getToken().getType()) {
             case MINUS: {
                 return new IntResult(-base.as(IntResult.class).getValue());
@@ -105,9 +130,9 @@ public class Evaluator {
         }
     }
 
-    private EvalResult eval(Infix infix) {
-        EvalResult left = eval(infix.getLeft());
-        EvalResult right = eval(infix.getRight());
+    private EvalResult eval(Infix infix, Env env) {
+        EvalResult left = eval(infix.getLeft(), env);
+        EvalResult right = eval(infix.getRight(), env);
         switch (infix.getToken().getType()) {
             case PLUS: {
                 return new IntResult(
