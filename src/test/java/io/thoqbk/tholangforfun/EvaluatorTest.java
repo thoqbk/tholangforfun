@@ -194,4 +194,23 @@ public class EvaluatorTest {
             assertEquals(expected, new Evaluator().eval(p).as(IntResult.class).getValue());
         }
     }
+
+    @Test
+    public void testClosure() {
+        String input = """
+                let first = 10;
+                let second = 10;
+                let third = 10;
+
+                let ourFunction = function(first) {
+                  let second = 20;
+
+                  first + second + third;
+                };
+
+                ourFunction(20) + first + second;
+                    """;
+        Program p = new Parser(input).parse();
+        assertEquals(70, new Evaluator().eval(p).as(IntResult.class).getValue());
+    }
 }
