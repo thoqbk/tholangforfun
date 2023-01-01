@@ -94,9 +94,9 @@ public class Evaluator {
         } else if (expression.is(Bool.class)) {
             return new BoolResult(expression.as(Bool.class).getValue());
         } else if (expression.is(Prefix.class)) {
-            return eval(expression.as(Prefix.class), env);
+            return evalPrefix(expression.as(Prefix.class), env);
         } else if (expression.is(Infix.class)) {
-            return eval(expression.as(Infix.class), env);
+            return evalInfix(expression.as(Infix.class), env);
         } else if (expression.is(Identifier.class)) {
             return env.getVariable(expression.as(Identifier.class).getToken().getLiteral());
         } else if (expression.is(Function.class)) {
@@ -109,7 +109,7 @@ public class Evaluator {
         throw new EvalException("Unknown expression " + expression);
     }
 
-    private EvalResult eval(Prefix prefix, Env env) {
+    private EvalResult evalPrefix(Prefix prefix, Env env) {
         EvalResult base = evalExpression(prefix.getRight(), env);
         switch (prefix.getToken().getType()) {
             case MINUS: {
@@ -128,7 +128,7 @@ public class Evaluator {
         }
     }
 
-    private EvalResult eval(Infix infix, Env env) {
+    private EvalResult evalInfix(Infix infix, Env env) {
         EvalResult left = evalExpression(infix.getLeft(), env);
         EvalResult right = evalExpression(infix.getRight(), env);
         switch (infix.getToken().getType()) {
