@@ -36,7 +36,7 @@ public class Evaluator {
         EvalResult retVal = NULL_RESULT;
         Env env = new Env();
         for (Statement statement : statements) {
-            EvalResult result = eval(statement, env);
+            EvalResult result = evalStatement(statement, env);
             if (result.is(NoResult.class)) {
                 continue;
             }
@@ -48,35 +48,35 @@ public class Evaluator {
         return retVal;
     }
 
-    private EvalResult eval(Statement statement, Env env) {
+    private EvalResult evalStatement(Statement statement, Env env) {
         if (statement.is(ExpressionStm.class)) {
-            return eval(statement.as(ExpressionStm.class).getExpression(), env);
+            return evalExpression(statement.as(ExpressionStm.class).getExpression(), env);
         } else if (statement.is(If.class)) {
-            return eval(statement.as(If.class), env);
+            return evalIf(statement.as(If.class), env);
         } else if (statement.is(Block.class)) {
-            return eval(statement.as(Block.class), env);
+            return evalBlock(statement.as(Block.class), env);
         } else if (statement.is(Return.class)) {
-            return new ReturnResult(eval(statement.as(Return.class).getValue(), env));
+            return new ReturnResult(evalExpression(statement.as(Return.class).getValue(), env));
         } else if (statement.is(Let.class)) {
             Let letStm = statement.as(Let.class);
-            env.setVariable(letStm.getVariableName(), eval(letStm.getExpression(), env));
+            env.setVariable(letStm.getVariableName(), evalExpression(letStm.getExpression(), env));
             return NO_RESULT;
         }
         throw new EvalException("Unknown statement " + statement);
     }
 
-    private EvalResult eval(If ifStm, Env env) {
-        return isTruthy(eval(ifStm.getCondition(), env)) ? eval(ifStm.getIfBody(), env)
-                : eval(ifStm.getElseBody(), env);
+    private EvalResult evalIf(If ifStm, Env env) {
+        return isTruthy(evalExpression(ifStm.getCondition(), env)) ? evalStatement(ifStm.getIfBody(), env)
+                : evalStatement(ifStm.getElseBody(), env);
     }
 
-    private EvalResult eval(Block block, Env env) {
+    private EvalResult evalBlock(Block block, Env env) {
         EvalResult retVal = NULL_RESULT;
         if (block == null) {
             return retVal;
         }
         for (Statement stm : block.getStatements()) {
-            EvalResult result = eval(stm, env);
+            EvalResult result = evalStatement(stm, env);
             if (result.is(NoResult.class)) {
                 continue;
             }
@@ -88,7 +88,7 @@ public class Evaluator {
         return retVal;
     }
 
-    private EvalResult eval(Expression expression, Env env) {
+    private EvalResult evalExpression(Expression expression, Env env) {
         if (expression.is(Int.class)) {
             return new IntResult(expression.as(Int.class).getValue());
         } else if (expression.is(Bool.class)) {
@@ -110,7 +110,7 @@ public class Evaluator {
     }
 
     private EvalResult eval(Prefix prefix, Env env) {
-        EvalResult base = eval(prefix.getRight(), env);
+        EvalResult base = evalExpression(prefix.getRight(), env);
         switch (prefix.getToken().getType()) {
             case MINUS: {
                 return new IntResult(-base.as(IntResult.class).getValue());
@@ -129,8 +129,8 @@ public class Evaluator {
     }
 
     private EvalResult eval(Infix infix, Env env) {
-        EvalResult left = eval(infix.getLeft(), env);
-        EvalResult right = eval(infix.getRight(), env);
+        EvalResult left = evalExpression(infix.getLeft(), env);
+        EvalResult right = evalExpression(infix.getRight(), env);
         switch (infix.getToken().getType()) {
             case PLUS: {
                 return new IntResult(
@@ -171,10 +171,10 @@ public class Evaluator {
         FunctionResult fn = env.getVariable(call.getFunctionName()).as(FunctionResult.class);
         for (int idx = 0; idx < fn.getParams().size(); idx++) {
             String paramName = fn.getParams().get(idx);
-            EvalResult value = call.getArgs().size() > idx ? eval(call.getArgs().get(idx), env) : NULL_RESULT;
+            EvalResult value = call.getArgs().size() > idx ? evalExpression(call.getArgs().get(idx), env) : NULL_RESULT;
             env.setVariable(paramName, value);
         }
-        EvalResult retVal = eval(fn.getBody(), env);
+        EvalResult retVal = evalStatement(fn.getBody(), env);
         if (retVal.is(ReturnResult.class)) {
             return retVal.as(ReturnResult.class).getValue();
         }
