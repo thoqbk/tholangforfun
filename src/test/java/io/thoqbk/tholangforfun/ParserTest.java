@@ -14,6 +14,7 @@ import io.thoqbk.tholangforfun.ast.expressions.Identifier;
 import io.thoqbk.tholangforfun.ast.expressions.Infix;
 import io.thoqbk.tholangforfun.ast.expressions.Int;
 import io.thoqbk.tholangforfun.ast.expressions.Prefix;
+import io.thoqbk.tholangforfun.ast.expressions.Str;
 import io.thoqbk.tholangforfun.ast.statements.ExpressionStm;
 import io.thoqbk.tholangforfun.ast.statements.If;
 import io.thoqbk.tholangforfun.ast.statements.Let;
@@ -182,6 +183,16 @@ public class ParserTest {
         var call = statements.get(0).as(ExpressionStm.class).getExpression().as(Call.class);
         assertNotNull(call.getFunction());
         assertEquals(1, call.getArgs().size());
+    }
+
+    @Test
+    public void parseString() {
+        String input = """
+                "hello world";
+                """;
+        List<Statement> statements = new Parser(input).parse().getStatements();
+        assertEquals(1, statements.size());
+        assertEquals("hello world", statements.get(0).as(ExpressionStm.class).getExpression().as(Str.class).getValue());
     }
 
     private void testExpressions(String[][] tests) {

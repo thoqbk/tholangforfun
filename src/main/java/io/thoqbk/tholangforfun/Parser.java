@@ -15,6 +15,7 @@ import io.thoqbk.tholangforfun.ast.expressions.Identifier;
 import io.thoqbk.tholangforfun.ast.expressions.Infix;
 import io.thoqbk.tholangforfun.ast.expressions.Int;
 import io.thoqbk.tholangforfun.ast.expressions.Prefix;
+import io.thoqbk.tholangforfun.ast.expressions.Str;
 import io.thoqbk.tholangforfun.ast.statements.Block;
 import io.thoqbk.tholangforfun.ast.statements.ExpressionStm;
 import io.thoqbk.tholangforfun.ast.statements.If;
@@ -28,6 +29,7 @@ public class Parser {
     private Map<TokenType, Supplier<Expression>> prefixParsers = Map.of(
             TokenType.IDENT, this::parseIdentifier,
             TokenType.INT, this::parseInt,
+            TokenType.STRING, this::parseString,
             TokenType.TRUE, this::parseBool,
             TokenType.FALSE, this::parseBool,
             TokenType.MINUS, this::parsePrefixExpression,
@@ -164,6 +166,10 @@ public class Parser {
 
     private Expression parseInt() {
         return new Int(lexer.currentToken());
+    }
+
+    private Expression parseString() {
+        return new Str(lexer.currentToken());
     }
 
     private Expression parseBool() {
