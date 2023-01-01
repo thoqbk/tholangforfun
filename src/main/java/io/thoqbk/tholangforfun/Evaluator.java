@@ -170,7 +170,7 @@ public class Evaluator {
 
     private EvalResult evalFunctionCall(Call call, Env parent) {
         Env env = new Env(parent);
-        FunctionResult fn = env.getVariable(call.getFunctionName()).as(FunctionResult.class);
+        FunctionResult fn = evalExpression(call.getFunction(), env).as(FunctionResult.class);
         for (int idx = 0; idx < fn.getParams().size(); idx++) {
             String paramName = fn.getParams().get(idx);
             EvalResult value = call.getArgs().size() > idx ? evalExpression(call.getArgs().get(idx), env) : NULL_RESULT;

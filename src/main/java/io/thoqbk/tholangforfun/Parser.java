@@ -229,8 +229,13 @@ public class Parser {
     }
 
     private Expression parseFunctionCall(Expression left) {
-        Call retVal = new Call(left.as(Identifier.class).getToken());
         assertCurrentToken(TokenType.LPAREN);
+        Call retVal = null;
+        if (left.is(Identifier.class) || left.is(Function.class)) {
+            retVal = new Call(lexer.currentToken(), left);
+        } else {
+            throw new ParserException("Invalid left expression for funcation call " + left);
+        }
         lexer.nextToken();
         retVal.setArgs(parseFunctionCallArgs());
         return retVal;

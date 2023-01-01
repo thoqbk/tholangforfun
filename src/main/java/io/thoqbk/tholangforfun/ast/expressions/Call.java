@@ -5,16 +5,16 @@ import java.util.List;
 import io.thoqbk.tholangforfun.Token;
 
 public class Call extends Expression {
-    private String functionName;
+    private Expression function; // Function or identifier
     private List<Expression> args;
 
-    public Call(Token token) {
+    public Call(Token token, Expression function) {
         super(token);
-        this.functionName = token.getLiteral();
+        this.function = function;
     }
 
-    public String getFunctionName() {
-        return functionName;
+    public Expression getFunction() {
+        return function;
     }
 
     public void setArgs(List<Expression> args) {

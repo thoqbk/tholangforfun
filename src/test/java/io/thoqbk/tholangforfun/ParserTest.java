@@ -10,6 +10,7 @@ import org.junit.Test;
 import io.thoqbk.tholangforfun.ast.expressions.Bool;
 import io.thoqbk.tholangforfun.ast.expressions.Call;
 import io.thoqbk.tholangforfun.ast.expressions.Function;
+import io.thoqbk.tholangforfun.ast.expressions.Identifier;
 import io.thoqbk.tholangforfun.ast.expressions.Infix;
 import io.thoqbk.tholangforfun.ast.expressions.Int;
 import io.thoqbk.tholangforfun.ast.expressions.Prefix;
@@ -165,10 +166,22 @@ public class ParserTest {
         List<Statement> statements = new Parser(input).parse().getStatements();
         assertEquals(1, statements.size());
         var call = statements.get(0).as(ExpressionStm.class).getExpression().as(Call.class);
-        assertEquals("add", call.getFunctionName());
+        assertEquals("add", call.getFunction().as(Identifier.class).getToken().getLiteral());
         assertEquals(3, call.getArgs().size());
         assertEquals(1, call.getArgs().get(0).as(Int.class).getValue());
         assertEquals(2, call.getArgs().get(2).as(Int.class).getValue());
+    }
+
+    @Test
+    public void parseFunctionCallWithFunctionLiteral() {
+        String input = """
+                function (x) {return x + 1;}(10);
+                """;
+        List<Statement> statements = new Parser(input).parse().getStatements();
+        assertEquals(1, statements.size());
+        var call = statements.get(0).as(ExpressionStm.class).getExpression().as(Call.class);
+        assertNotNull(call.getFunction());
+        assertEquals(1, call.getArgs().size());
     }
 
     private void testExpressions(String[][] tests) {

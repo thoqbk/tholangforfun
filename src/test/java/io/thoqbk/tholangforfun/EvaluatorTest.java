@@ -185,6 +185,7 @@ public class EvaluatorTest {
                 new String[] { "let double = function(x) { x * 2; }; double(5);", "10" },
                 new String[] { "let add = function(x, y) { x + y; }; add(5, 5);", "10" },
                 new String[] { "let add = function(x, y) { x + y; }; add(5 + 5, add(5, 5));", "20" },
+                new String[] { "function(x) { x; }(5)", "5" },
         };
         for (String[] test : tests) {
             String input = test[0];
