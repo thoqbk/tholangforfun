@@ -10,4 +10,9 @@ public class IntResult extends EvalResult {
     public int getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return "" + value;
+    }
 }

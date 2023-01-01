@@ -10,6 +10,7 @@ import io.thoqbk.tholangforfun.eval.EvalResult;
 import io.thoqbk.tholangforfun.eval.IntResult;
 import io.thoqbk.tholangforfun.eval.NullResult;
 import io.thoqbk.tholangforfun.eval.ReturnResult;
+import io.thoqbk.tholangforfun.eval.StrResult;
 
 public class EvaluatorTest {
     @Test
@@ -212,5 +213,14 @@ public class EvaluatorTest {
                     """;
         Program p = new Parser(input).parse();
         assertEquals(70, new Evaluator().eval(p).as(IntResult.class).getValue());
+    }
+
+    @Test
+    public void concateStrings() {
+        String input = """
+                "hello" + " " + "world";
+                """;
+        Program p = new Parser(input).parse();
+        assertEquals("hello world", new Evaluator().eval(p).as(StrResult.class).getValue());
     }
 }

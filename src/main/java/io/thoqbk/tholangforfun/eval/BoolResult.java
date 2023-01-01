@@ -10,4 +10,9 @@ public class BoolResult extends EvalResult {
     public boolean getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return "" + value;
+    }
 }

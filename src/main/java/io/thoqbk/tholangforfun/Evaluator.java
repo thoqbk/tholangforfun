@@ -11,6 +11,7 @@ import io.thoqbk.tholangforfun.ast.expressions.Identifier;
 import io.thoqbk.tholangforfun.ast.expressions.Infix;
 import io.thoqbk.tholangforfun.ast.expressions.Int;
 import io.thoqbk.tholangforfun.ast.expressions.Prefix;
+import io.thoqbk.tholangforfun.ast.expressions.Str;
 import io.thoqbk.tholangforfun.ast.statements.Block;
 import io.thoqbk.tholangforfun.ast.statements.ExpressionStm;
 import io.thoqbk.tholangforfun.ast.statements.If;
@@ -25,6 +26,7 @@ import io.thoqbk.tholangforfun.eval.IntResult;
 import io.thoqbk.tholangforfun.eval.NoResult;
 import io.thoqbk.tholangforfun.eval.NullResult;
 import io.thoqbk.tholangforfun.eval.ReturnResult;
+import io.thoqbk.tholangforfun.eval.StrResult;
 import io.thoqbk.tholangforfun.exceptions.EvalException;
 
 public class Evaluator {
@@ -95,6 +97,8 @@ public class Evaluator {
             return new IntResult(expression.as(Int.class).getValue());
         } else if (expression.is(Bool.class)) {
             return new BoolResult(expression.as(Bool.class).getValue());
+        } else if (expression.is(Str.class)) {
+            return new StrResult(expression.as(Str.class).getValue());
         } else if (expression.is(Prefix.class)) {
             return evalPrefix(expression.as(Prefix.class), env);
         } else if (expression.is(Infix.class)) {
@@ -108,7 +112,7 @@ public class Evaluator {
         } else if (expression.is(Call.class)) {
             return evalFunctionCall(expression.as(Call.class), env);
         }
-        throw new EvalException("Unknown expression " + expression);
+        throw new EvalException("Unknown expression " + expression.getClass().getSimpleName());
     }
 
     private EvalResult evalPrefix(Prefix prefix, Env env) {
@@ -135,8 +139,7 @@ public class Evaluator {
         EvalResult right = evalExpression(infix.getRight(), env);
         switch (infix.getToken().getType()) {
             case PLUS: {
-                return new IntResult(
-                        left.as(IntResult.class).getValue() + right.as(IntResult.class).getValue());
+                return evalPlus(left, right);
             }
             case MINUS: {
                 return new IntResult(
@@ -189,6 +192,15 @@ public class Evaluator {
         boolean boolCase = left.is(BoolResult.class) && right.is(BoolResult.class)
                 && left.as(BoolResult.class).getValue() == right.as(BoolResult.class).getValue();
         return new BoolResult(intCase || boolCase);
+    }
+
+    private EvalResult evalPlus(EvalResult left, EvalResult right) {
+        if (left.is(IntResult.class) && right.is(IntResult.class)) {
+            return new IntResult(left.as(IntResult.class).getValue() + right.as(IntResult.class).getValue());
+        } else if (left.is(StrResult.class) || right.is(StrResult.class)) {
+            return new StrResult(left.toString() + right.toString());
+        }
+        throw new EvalException("Doesn't support + on " + left + " and " + right);
     }
 
     private boolean isTruthy(EvalResult result) {
