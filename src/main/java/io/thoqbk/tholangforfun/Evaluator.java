@@ -66,15 +66,17 @@ public class Evaluator {
     }
 
     private EvalResult evalIf(If ifStm, Env env) {
-        return isTruthy(evalExpression(ifStm.getCondition(), env)) ? evalStatement(ifStm.getIfBody(), env)
-                : evalStatement(ifStm.getElseBody(), env);
+        if (isTruthy(evalExpression(ifStm.getCondition(), env))) {
+            return evalStatement(ifStm.getIfBody(), env);
+        }
+        if (ifStm.getElseBody() != null) {
+            return evalStatement(ifStm.getElseBody(), env);
+        }
+        return NULL_RESULT;
     }
 
     private EvalResult evalBlock(Block block, Env env) {
         EvalResult retVal = NULL_RESULT;
-        if (block == null) {
-            return retVal;
-        }
         for (Statement stm : block.getStatements()) {
             EvalResult result = evalStatement(stm, env);
             if (result.is(NoResult.class)) {
