@@ -7,6 +7,7 @@ public enum TokenType {
     EOF("EOF"),
     IDENT("IDENT"), // add, foobar
     INT("INT"), // 123
+    STRING("STRING"), // "foo bar"
 
     // Operators
     ASSIGN("="),

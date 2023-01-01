@@ -83,6 +83,10 @@ public class Lexer {
                 retVal = new Token(TokenType.RPAREN, ch);
                 break;
             }
+            case '"': {
+                retVal = new Token(TokenType.STRING, readString());
+                break;
+            }
             case 0: {
                 retVal = new Token(TokenType.EOF, ch);
                 break;
@@ -146,6 +150,15 @@ public class Lexer {
             readChar();
         }
         return input.substring(start, state.nextChIdx);
+    }
+
+    private String readString() {
+        int start = state.nextChIdx;
+        while (peekChar() != '"') {
+            readChar();
+        }
+        readChar();
+        return input.substring(start, state.nextChIdx - 1);
     }
 
     private void skipWhitespaces() {
