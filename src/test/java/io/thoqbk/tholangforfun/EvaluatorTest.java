@@ -223,4 +223,19 @@ public class EvaluatorTest {
         Program p = new Parser(input).parse();
         assertEquals("hello world", new Evaluator().eval(p).as(StrResult.class).getValue());
     }
+
+    @Test
+    public void stringLength() {
+        String[][] tests = new String[][] {
+                new String[] { "len(\"\")", "0" },
+                new String[] { "len(\"four\")", "4" },
+                new String[] { "len(\"hello world\")", "11" },
+        };
+        for (String[] test : tests) {
+            String input = test[0];
+            int expected = Integer.parseInt(test[1]);
+            Program p = new Parser(input).parse();
+            assertEquals(expected, new Evaluator().eval(p).as(IntResult.class).getValue());
+        }
+    }
 }

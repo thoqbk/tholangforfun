@@ -19,6 +19,7 @@ import io.thoqbk.tholangforfun.ast.statements.Let;
 import io.thoqbk.tholangforfun.ast.statements.Return;
 import io.thoqbk.tholangforfun.ast.statements.Statement;
 import io.thoqbk.tholangforfun.eval.BoolResult;
+import io.thoqbk.tholangforfun.eval.BuiltInResult;
 import io.thoqbk.tholangforfun.eval.Env;
 import io.thoqbk.tholangforfun.eval.EvalResult;
 import io.thoqbk.tholangforfun.eval.FunctionResult;
@@ -104,7 +105,16 @@ public class Evaluator {
         } else if (expression.is(Infix.class)) {
             return evalInfix(expression.as(Infix.class), env);
         } else if (expression.is(Identifier.class)) {
-            return env.getVariable(expression.as(Identifier.class).getToken().getLiteral());
+            String name = expression.as(Identifier.class).getToken().getLiteral();
+            EvalResult retVal = env.getVariable(name);
+            if (retVal != null) {
+                return retVal;
+            }
+            retVal = BuiltIns.get(name);
+            if (retVal == null) {
+                throw new EvalException(String.format("Variable '%s' used before being initialized", name));
+            }
+            return retVal;
         } else if (expression.is(Function.class)) {
             Function fn = expression.as(Function.class);
             return new FunctionResult(fn.getParams().stream().map(param -> param.getToken().getLiteral()).toList(),
@@ -172,18 +182,27 @@ public class Evaluator {
     }
 
     private EvalResult evalFunctionCall(Call call, Env parent) {
-        Env env = new Env(parent);
-        FunctionResult fn = evalExpression(call.getFunction(), env).as(FunctionResult.class);
-        for (int idx = 0; idx < fn.getParams().size(); idx++) {
-            String paramName = fn.getParams().get(idx);
-            EvalResult value = call.getArgs().size() > idx ? evalExpression(call.getArgs().get(idx), env) : NULL_RESULT;
-            env.setVariable(paramName, value);
+        EvalResult fnResult = evalExpression(call.getFunction(), parent);
+        if (fnResult.is(FunctionResult.class)) {
+            Env env = new Env(parent);
+            FunctionResult fn = evalExpression(call.getFunction(), env).as(FunctionResult.class);
+            for (int idx = 0; idx < fn.getParams().size(); idx++) {
+                String paramName = fn.getParams().get(idx);
+                EvalResult value = call.getArgs().size() > idx ? evalExpression(call.getArgs().get(idx), env)
+                        : NULL_RESULT;
+                env.setVariable(paramName, value);
+            }
+            EvalResult retVal = evalStatement(fn.getBody(), env);
+            if (retVal.is(ReturnResult.class)) {
+                return retVal.as(ReturnResult.class).getValue();
+            }
+            return retVal;
+        } else if (fnResult.is(BuiltInResult.class)) {
+            EvalResult[] args = call.getArgs().stream().map(arg -> evalExpression(arg, parent))
+                    .toArray(EvalResult[]::new);
+            return fnResult.as(BuiltInResult.class).getFunction().apply(args);
         }
-        EvalResult retVal = evalStatement(fn.getBody(), env);
-        if (retVal.is(ReturnResult.class)) {
-            return retVal.as(ReturnResult.class).getValue();
-        }
-        return retVal;
+        throw new EvalException("Invalid function call. Type " + fnResult);
     }
 
     private EvalResult evalEqual(EvalResult left, EvalResult right) {
