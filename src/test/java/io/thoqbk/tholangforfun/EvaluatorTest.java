@@ -238,4 +238,22 @@ public class EvaluatorTest {
             assertEquals(expected, new Evaluator().eval(p).as(IntResult.class).getValue());
         }
     }
+
+    @Test
+    public void fibonacci() {
+        String input = """
+                let fib = function (n) {
+                    if (n == 0) {
+                        return 0;
+                    }
+                    if (n == 1) {
+                        return 1;
+                    }
+                    return fib(n - 1) + fib(n - 2);
+                };
+                fib(8);
+                """;
+        Program p = new Parser(input).parse();
+        assertEquals(21, new Evaluator().eval(p).as(IntResult.class).getValue());
+    }
 }
