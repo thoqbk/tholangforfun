@@ -183,6 +183,10 @@ public class Evaluator {
             case NOT_EQ: {
                 return new BoolResult(!evalEqual(left, right).as(BoolResult.class).getValue());
             }
+            case ASSIGN: {
+                env.setVariable(infix.getLeft().as(Identifier.class).getToken().getLiteral(), right);
+                return right;
+            }
             default: {
                 throw new EvalException("Invalid infix operator '" + infix.getToken().getType() + "'");
             }

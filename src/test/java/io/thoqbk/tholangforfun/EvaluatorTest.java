@@ -271,4 +271,16 @@ public class EvaluatorTest {
         Program p = new Parser(input).parse();
         assertNotNull(new Evaluator().eval(p).as(NoResult.class));
     }
+
+    @Test
+    public void updateVariable() {
+        String input = """
+                let x = 10;
+                let y = 20;
+                x = x + y;
+                x;
+                """;
+        Program p = new Parser(input).parse();
+        assertEquals(30, new Evaluator().eval(p).as(IntResult.class).getValue());
+    }
 }

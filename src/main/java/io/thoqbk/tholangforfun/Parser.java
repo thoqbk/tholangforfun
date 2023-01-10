@@ -46,21 +46,23 @@ public class Parser {
             TokenType.LT, this::parseInfixExpression,
             TokenType.EQ, this::parseInfixExpression,
             TokenType.NOT_EQ, this::parseInfixExpression,
-            TokenType.LPAREN, this::parseFunctionCall);
+            TokenType.LPAREN, this::parseFunctionCall,
+            TokenType.ASSIGN, this::parseInfixExpression);
     private static final int LOWEST_PRECEDENCE = 0;
     private Map<TokenType, Integer> precedences = Map.ofEntries(
             entry(TokenType.RPAREN, LOWEST_PRECEDENCE),
             entry(TokenType.EOF, LOWEST_PRECEDENCE),
-            entry(TokenType.EQ, 1),
-            entry(TokenType.NOT_EQ, 1),
-            entry(TokenType.GT, 2),
-            entry(TokenType.LT, 2),
-            entry(TokenType.PLUS, 3),
-            entry(TokenType.MINUS, 3),
-            entry(TokenType.SLASH, 4),
-            entry(TokenType.ASTERISK, 4),
-            entry(TokenType.LPAREN, 5));
-    private static final int PREFIX_PRECEDENCE = 5;
+            entry(TokenType.ASSIGN, 1),
+            entry(TokenType.EQ, 2),
+            entry(TokenType.NOT_EQ, 2),
+            entry(TokenType.GT, 3),
+            entry(TokenType.LT, 3),
+            entry(TokenType.PLUS, 4),
+            entry(TokenType.MINUS, 4),
+            entry(TokenType.SLASH, 5),
+            entry(TokenType.ASTERISK, 5),
+            entry(TokenType.LPAREN, 6));
+    private static final int PREFIX_PRECEDENCE = 7;
 
     public Parser(String input) {
         lexer = new Lexer(input);
