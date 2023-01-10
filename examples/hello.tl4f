@@ -1,0 +1,2 @@
+let abc = "Tho Luong";
+"Hello " + abc;

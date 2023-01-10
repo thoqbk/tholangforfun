@@ -1,0 +1,4 @@
+let add = function (a, b) {
+    return a + b;
+};
+100 + 100 * add(1, add(2, 3)) + 300;
