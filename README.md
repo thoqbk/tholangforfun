@@ -17,3 +17,21 @@ let fib = function (n) {
 
 fib(8);
 ```
+
+## Build
+
+Move to the root directory of the project then run the folllowing command
+
+```
+mvn clean compile assembly:single && cp -rf ./target/tl4f.jar .
+```
+
+The output jar file is `tl4f.jar` in the root folder
+
+## Run
+
+Create .tl4f source file then run:
+
+```
+java -jar tl4f.jar <source file>.tl4f
+```
