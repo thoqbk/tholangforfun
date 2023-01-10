@@ -53,6 +53,7 @@ public class LexerTest {
                 10 != 9;
                 "foobar"
                 "foo bar"
+                put 1;
                     """
                 + "\"test quotes\"";
         Token[] expected = new Token[] {
@@ -139,6 +140,9 @@ public class LexerTest {
                 new Token(TokenType.SEMICOLON, ";"),
                 new Token(TokenType.STRING, "foobar"),
                 new Token(TokenType.STRING, "foo bar"),
+                new Token(TokenType.PUT, "put"),
+                new Token(TokenType.INT, "1"),
+                new Token(TokenType.SEMICOLON, ";"),
                 new Token(TokenType.STRING, "test quotes"),
         };
         testTokens(input, expected);

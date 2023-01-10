@@ -16,6 +16,7 @@ import io.thoqbk.tholangforfun.ast.statements.Block;
 import io.thoqbk.tholangforfun.ast.statements.ExpressionStm;
 import io.thoqbk.tholangforfun.ast.statements.If;
 import io.thoqbk.tholangforfun.ast.statements.Let;
+import io.thoqbk.tholangforfun.ast.statements.Put;
 import io.thoqbk.tholangforfun.ast.statements.Return;
 import io.thoqbk.tholangforfun.ast.statements.Statement;
 import io.thoqbk.tholangforfun.eval.BoolResult;
@@ -36,7 +37,7 @@ public class Evaluator {
 
     public EvalResult eval(Program program) {
         List<Statement> statements = program.getStatements();
-        EvalResult retVal = NULL_RESULT;
+        EvalResult retVal = NO_RESULT;
         Env env = new Env();
         for (Statement statement : statements) {
             EvalResult result = evalStatement(statement, env);
@@ -63,6 +64,10 @@ public class Evaluator {
         } else if (statement.is(Let.class)) {
             Let letStm = statement.as(Let.class);
             env.setVariable(letStm.getVariableName(), evalExpression(letStm.getExpression(), env));
+            return NO_RESULT;
+        } else if (statement.is(Put.class)) {
+            var putStm = statement.as(Put.class);
+            System.out.println(evalExpression(putStm.getExpression(), env));
             return NO_RESULT;
         }
         throw new EvalException("Unknown statement " + statement);
@@ -94,6 +99,9 @@ public class Evaluator {
     }
 
     private EvalResult evalExpression(Expression expression, Env env) {
+        if (expression == null) {
+            return NULL_RESULT;
+        }
         if (expression.is(Int.class)) {
             return new IntResult(expression.as(Int.class).getValue());
         } else if (expression.is(Bool.class)) {

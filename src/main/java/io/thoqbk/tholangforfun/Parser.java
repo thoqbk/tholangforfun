@@ -20,6 +20,7 @@ import io.thoqbk.tholangforfun.ast.statements.Block;
 import io.thoqbk.tholangforfun.ast.statements.ExpressionStm;
 import io.thoqbk.tholangforfun.ast.statements.If;
 import io.thoqbk.tholangforfun.ast.statements.Let;
+import io.thoqbk.tholangforfun.ast.statements.Put;
 import io.thoqbk.tholangforfun.ast.statements.Return;
 import io.thoqbk.tholangforfun.ast.statements.Statement;
 import io.thoqbk.tholangforfun.exceptions.ParserException;
@@ -88,6 +89,9 @@ public class Parser {
             case IF: {
                 return parseIfStatement();
             }
+            case PUT: {
+                return parsePutStatement();
+            }
             default: {
                 return parseExpressionStatement();
             }
@@ -102,13 +106,22 @@ public class Parser {
         lexer.nextToken();
         lexer.nextToken();
         retVal.setExpression(parseExpression());
-        assertPeekTokenThenNext(TokenType.SEMICOLON);
+        if (retVal.getExpression() != null && retVal.getExpression().is(Function.class)) {
+            if (peekTokenIs(TokenType.SEMICOLON)) {
+                lexer.nextToken();
+            }
+        } else {
+            assertPeekTokenThenNext(TokenType.SEMICOLON);
+        }
         return retVal;
     }
 
     private Statement parseReturnStatement() {
         Return retVal = new Return(lexer.currentToken());
         lexer.nextToken();
+        if (currentTokenIs(TokenType.SEMICOLON)) {
+            return retVal;
+        }
         retVal.setValue(parseExpression());
         assertPeekTokenThenNext(TokenType.SEMICOLON);
         return retVal;
@@ -197,6 +210,14 @@ public class Parser {
             lexer.nextToken();
             retVal.setElseBody(parseBlockStatement());
         }
+        return retVal;
+    }
+
+    private Statement parsePutStatement() {
+        var retVal = new Put(lexer.currentToken());
+        lexer.nextToken();
+        retVal.setExpression(parseExpression());
+        assertPeekTokenThenNext(TokenType.SEMICOLON);
         return retVal;
     }
 

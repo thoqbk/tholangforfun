@@ -1,0 +1,11 @@
+put "Hello " + "ThoLangForFun";
+
+let putRecursively = function (n) {
+    if (n < 0) {
+        return;
+    }
+    putRecursively(n - 1);
+    put n;
+}
+
+putRecursively(10);

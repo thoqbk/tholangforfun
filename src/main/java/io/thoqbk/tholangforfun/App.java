@@ -14,6 +14,6 @@ public class App {
         var input = Files.readString(Path.of(System.getProperty("user.dir"), args[0]), Charset.forName("utf8"));
         var program = new Parser(input).parse();
         var result = new Evaluator().eval(program);
-        System.out.println(result);
+        System.out.println("Exit with " + result);
     }
 }

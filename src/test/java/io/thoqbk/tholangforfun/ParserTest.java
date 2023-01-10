@@ -186,6 +186,20 @@ public class ParserTest {
     }
 
     @Test
+    public void parseFunctionWithoutSemicolon() {
+        String input = """
+                let add = function (a, b) {return a + b;}
+                """;
+        List<Statement> statements = new Parser(input).parse().getStatements();
+        assertEquals(1, statements.size());
+        var fn = statements.get(0).as(Let.class).getExpression().as(Function.class);
+        assertEquals(2, fn.getParams().size());
+        assertEquals("a", fn.getParams().get(0).getToken().getLiteral());
+        assertEquals("b", fn.getParams().get(1).getToken().getLiteral());
+        assertEquals(1, fn.getBody().getStatements().size());
+    }
+
+    @Test
     public void parseString() {
         String input = """
                 "hello world";

@@ -1,6 +1,8 @@
 package io.thoqbk.tholangforfun;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -8,6 +10,7 @@ import io.thoqbk.tholangforfun.ast.Program;
 import io.thoqbk.tholangforfun.eval.BoolResult;
 import io.thoqbk.tholangforfun.eval.EvalResult;
 import io.thoqbk.tholangforfun.eval.IntResult;
+import io.thoqbk.tholangforfun.eval.NoResult;
 import io.thoqbk.tholangforfun.eval.NullResult;
 import io.thoqbk.tholangforfun.eval.ReturnResult;
 import io.thoqbk.tholangforfun.eval.StrResult;
@@ -121,6 +124,7 @@ public class EvaluatorTest {
                 new String[] { "return 2 * 5; 9;", "10" },
                 new String[] { "9; return 2 * 5; 9;", "10" },
                 new String[] { "if (10 > 1) { return 10; }", "10" },
+                new String[] { "return;", null },
                 new String[] {
                         """
                                 if (10 > 1) {
@@ -134,10 +138,14 @@ public class EvaluatorTest {
         };
         for (String[] test : tests) {
             String input = test[0];
-            int expected = Integer.parseInt(test[1]);
             Program p = new Parser(input).parse();
-            assertEquals(expected,
-                    new Evaluator().eval(p).as(ReturnResult.class).getValue().as(IntResult.class).getValue());
+            if (test[1] != null) {
+                int expected = Integer.parseInt(test[1]);
+                assertEquals(expected,
+                        new Evaluator().eval(p).as(ReturnResult.class).getValue().as(IntResult.class).getValue());
+            } else {
+                assertTrue(new Evaluator().eval(p).as(ReturnResult.class).getValue().is(NullResult.class));
+            }
         }
     }
 
@@ -255,5 +263,12 @@ public class EvaluatorTest {
                 """;
         Program p = new Parser(input).parse();
         assertEquals(21, new Evaluator().eval(p).as(IntResult.class).getValue());
+    }
+
+    @Test
+    public void put() {
+        String input = "put 1;";
+        Program p = new Parser(input).parse();
+        assertNotNull(new Evaluator().eval(p).as(NoResult.class));
     }
 }
