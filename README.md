@@ -50,7 +50,7 @@ Create .tl4f source file then run:
 java -jar tl4f.jar <source file>.tl4f
 ```
 
-Or checkout examples in `examples` folder e.g. 
+Or checkout examples in [examples](./examples/) folder e.g. 
 
 ```
 java -jar target/tl4f.jar examples/put.tl4f
