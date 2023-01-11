@@ -70,5 +70,5 @@ Hello ThoLangForFun
 8
 9
 10
-null
+Exit with result null
 ```
