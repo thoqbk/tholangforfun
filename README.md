@@ -4,6 +4,8 @@ An effort to implement a simple programming language for fun
 
 Sample code:
 
+Function & recursion:
+
 ```
 let fib = function (n) {
     if (n == 0) {
@@ -16,6 +18,18 @@ let fib = function (n) {
 };
 
 fib(8);
+```
+
+While loop:
+
+```
+let n = 10;
+let message = "I am counting ";
+while (n > 0) {
+    message = message + n + " ";
+    n = n - 1;
+}
+put message;
 ```
 
 ## Build
