@@ -283,4 +283,19 @@ public class EvaluatorTest {
         Program p = new Parser(input).parse();
         assertEquals(30, new Evaluator().eval(p).as(IntResult.class).getValue());
     }
+
+    @Test
+    public void whileTest() {
+        String input = """
+                let n = 20;
+                let count = 0;
+                while (n > 0) {
+                    n = n - 2;
+                    count = count + 1;
+                }
+                return count;
+                """;
+        Program p = new Parser(input).parse();
+        assertEquals(10, new Evaluator().eval(p).as(ReturnResult.class).getValue().as(IntResult.class).getValue());
+    }
 }

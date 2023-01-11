@@ -23,6 +23,7 @@ import io.thoqbk.tholangforfun.ast.statements.Let;
 import io.thoqbk.tholangforfun.ast.statements.Put;
 import io.thoqbk.tholangforfun.ast.statements.Return;
 import io.thoqbk.tholangforfun.ast.statements.Statement;
+import io.thoqbk.tholangforfun.ast.statements.While;
 import io.thoqbk.tholangforfun.exceptions.ParserException;
 
 public class Parser {
@@ -93,6 +94,9 @@ public class Parser {
             }
             case PUT: {
                 return parsePutStatement();
+            }
+            case WHILE: {
+                return parseWhileStatement();
             }
             default: {
                 return parseExpressionStatement();
@@ -220,6 +224,18 @@ public class Parser {
         lexer.nextToken();
         retVal.setExpression(parseExpression());
         assertPeekTokenThenNext(TokenType.SEMICOLON);
+        return retVal;
+    }
+
+    private Statement parseWhileStatement() {
+        var retVal = new While(lexer.currentToken());
+        assertPeekTokenThenNext(TokenType.LPAREN);
+        lexer.nextToken();
+        retVal.setCondition(parseExpression());
+        assertPeekTokenThenNext(TokenType.RPAREN);
+        assertPeekTokenThenNext(TokenType.LBRACE);
+        retVal.setBody(parseBlockStatement());
+        assertCurrentToken(TokenType.RBRACE);
         return retVal;
     }
 

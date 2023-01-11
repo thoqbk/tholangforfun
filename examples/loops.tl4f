@@ -1,0 +1,7 @@
+let n = 10;
+let message = "I am counting ";
+while (n > 0) {
+    message = message + n + " ";
+    n = n - 1;
+}
+put message;

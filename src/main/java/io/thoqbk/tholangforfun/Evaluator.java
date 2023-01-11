@@ -19,6 +19,7 @@ import io.thoqbk.tholangforfun.ast.statements.Let;
 import io.thoqbk.tholangforfun.ast.statements.Put;
 import io.thoqbk.tholangforfun.ast.statements.Return;
 import io.thoqbk.tholangforfun.ast.statements.Statement;
+import io.thoqbk.tholangforfun.ast.statements.While;
 import io.thoqbk.tholangforfun.eval.BoolResult;
 import io.thoqbk.tholangforfun.eval.BuiltInResult;
 import io.thoqbk.tholangforfun.eval.Env;
@@ -69,6 +70,8 @@ public class Evaluator {
             var putStm = statement.as(Put.class);
             System.out.println(evalExpression(putStm.getExpression(), env));
             return NO_RESULT;
+        } else if (statement.is(While.class)) {
+            return evalWhile(statement.as(While.class), new Env(env));
         }
         throw new EvalException("Unknown statement " + statement);
     }
@@ -81,6 +84,24 @@ public class Evaluator {
             return evalStatement(ifStm.getElseBody(), env);
         }
         return NULL_RESULT;
+    }
+
+    private EvalResult evalWhile(While whileStm, Env env) {
+        EvalResult retVal = NULL_RESULT;
+        while (true) {
+            EvalResult conditionResult = evalExpression(whileStm.getCondition(), env);
+            if (!isTruthy(conditionResult)) {
+                break;
+            }
+            EvalResult result = evalBlock(whileStm.getBody(), env);
+            if (result.is(ReturnResult.class)) {
+                return result;
+            }
+            if (!result.is(NoResult.class)) {
+                retVal = result;
+            }
+        }
+        return retVal;
     }
 
     private EvalResult evalBlock(Block block, Env env) {
@@ -184,7 +205,7 @@ public class Evaluator {
                 return new BoolResult(!evalEqual(left, right).as(BoolResult.class).getValue());
             }
             case ASSIGN: {
-                env.setVariable(infix.getLeft().as(Identifier.class).getToken().getLiteral(), right);
+                env.updateVariable(infix.getLeft().as(Identifier.class).getToken().getLiteral(), right);
                 return right;
             }
             default: {

@@ -40,6 +40,7 @@ public enum TokenType {
     IF("IF"),
     ELSE("ELSE"),
     PUT("PUT"),
+    WHILE("while"),
     RETURN("RETURN");
 
     private static final Map<String, TokenType> KEYWORDS = Map.of(
@@ -50,6 +51,7 @@ public enum TokenType {
             "if", IF,
             "else", ELSE,
             "put", PUT,
+            "while", WHILE,
             "return", RETURN);
 
     private final String value;
