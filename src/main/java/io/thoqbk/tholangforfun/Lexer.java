@@ -3,11 +3,11 @@ package io.thoqbk.tholangforfun;
 public class Lexer {
     private final String input;
     private State state = new State();
-
+    
     public Lexer(String input) {
         this.input = input;
     }
-
+    
     public Token nextToken() {
         Token retVal;
         skipWhitespaces();
@@ -52,11 +52,21 @@ public class Lexer {
                 break;
             }
             case '<': {
-                retVal = new Token(TokenType.LT, ch);
+                if (peekChar() == '=') {
+                    retVal = new Token(TokenType.LTE, "" + Character.toString(ch) + Character.toString(peekChar()));
+                    readChar();
+                } else {
+                    retVal = new Token(TokenType.LT, ch);
+                }
                 break;
             }
             case '>': {
-                retVal = new Token(TokenType.GT, ch);
+                if (peekChar() == '=') {
+                    retVal = new Token(TokenType.GTE, "" + Character.toString(ch) + Character.toString(peekChar()));
+                    readChar();
+                } else {
+                    retVal = new Token(TokenType.GT, ch);
+                }
                 break;
             }
             case ';': {
@@ -105,18 +115,18 @@ public class Lexer {
         state.currentToken = retVal;
         return retVal;
     }
-
+    
     public Token currentToken() {
         return state.currentToken;
     }
-
+    
     public Token peekToken() {
         State old = state.clone();
         Token retVal = nextToken();
         state = old;
         return retVal;
     }
-
+    
     private int readChar() {
         if (state.nextChIdx >= input.length()) {
             return -1;
@@ -124,18 +134,18 @@ public class Lexer {
         state.ch = input.charAt(state.nextChIdx++);
         return state.ch;
     }
-
+    
     private int currentChar() {
         return state.ch;
     }
-
+    
     private int peekChar() {
         if (state.nextChIdx >= input.length()) {
             return -1;
         }
         return input.charAt(state.nextChIdx);
     }
-
+    
     private String readNumber() {
         int start = state.nextChIdx - 1;
         while (isDigit(peekChar())) {
@@ -143,7 +153,7 @@ public class Lexer {
         }
         return input.substring(start, state.nextChIdx);
     }
-
+    
     private String readIdentifier() {
         int start = state.nextChIdx - 1;
         while (isLetter(peekChar())) {
@@ -151,7 +161,7 @@ public class Lexer {
         }
         return input.substring(start, state.nextChIdx);
     }
-
+    
     private String readString() {
         int start = state.nextChIdx;
         while (peekChar() != '"') {
@@ -160,30 +170,30 @@ public class Lexer {
         readChar();
         return input.substring(start, state.nextChIdx - 1);
     }
-
+    
     private void skipWhitespaces() {
         while (isWhitespace(peekChar())) {
             readChar();
         }
     }
-
+    
     private static boolean isLetter(int ch) {
         return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_';
     }
-
+    
     private static boolean isDigit(int ch) {
         return '0' <= ch && ch <= '9';
     }
-
+    
     private static boolean isWhitespace(int ch) {
         return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r';
     }
-
+    
     private static class State {
         private int nextChIdx = 0;
         private int ch = -1;
         private Token currentToken;
-
+        
         public State clone() {
             State retVal = new State();
             retVal.nextChIdx = nextChIdx;

@@ -38,17 +38,19 @@ public class Parser {
             TokenType.BANG, this::parsePrefixExpression,
             TokenType.LPAREN, this::parseLeftParen,
             TokenType.FUNCTION, this::parseFunction);
-    private Map<TokenType, java.util.function.Function<Expression, Expression>> infixParsers = Map.of(
-            TokenType.PLUS, this::parseInfixExpression,
-            TokenType.MINUS, this::parseInfixExpression,
-            TokenType.SLASH, this::parseInfixExpression,
-            TokenType.ASTERISK, this::parseInfixExpression,
-            TokenType.GT, this::parseInfixExpression,
-            TokenType.LT, this::parseInfixExpression,
-            TokenType.EQ, this::parseInfixExpression,
-            TokenType.NOT_EQ, this::parseInfixExpression,
-            TokenType.LPAREN, this::parseFunctionCall,
-            TokenType.ASSIGN, this::parseInfixExpression);
+    private Map<TokenType, java.util.function.Function<Expression, Expression>> infixParsers = Map.ofEntries(
+            entry(TokenType.PLUS, this::parseInfixExpression),
+            entry(TokenType.MINUS, this::parseInfixExpression),
+            entry(TokenType.SLASH, this::parseInfixExpression),
+            entry(TokenType.ASTERISK, this::parseInfixExpression),
+            entry(TokenType.GT, this::parseInfixExpression),
+            entry(TokenType.LT, this::parseInfixExpression),
+            entry(TokenType.GTE, this::parseInfixExpression),
+            entry(TokenType.LTE, this::parseInfixExpression),
+            entry(TokenType.EQ, this::parseInfixExpression),
+            entry(TokenType.NOT_EQ, this::parseInfixExpression),
+            entry(TokenType.LPAREN, this::parseFunctionCall),
+            entry(TokenType.ASSIGN, this::parseInfixExpression));
     private static final int LOWEST_PRECEDENCE = 0;
     private Map<TokenType, Integer> precedences = Map.ofEntries(
             entry(TokenType.RPAREN, LOWEST_PRECEDENCE),
@@ -58,6 +60,8 @@ public class Parser {
             entry(TokenType.NOT_EQ, 2),
             entry(TokenType.GT, 3),
             entry(TokenType.LT, 3),
+            entry(TokenType.GTE, 3),
+            entry(TokenType.LTE, 3),
             entry(TokenType.PLUS, 4),
             entry(TokenType.MINUS, 4),
             entry(TokenType.SLASH, 5),
@@ -327,7 +331,7 @@ public class Parser {
     private void assertTokenType(Token token, TokenType tokenType) {
         if (token.getType() != tokenType) {
             throw new ParserException(
-                    "Expect token to be \'" + tokenType + "\', received \'" + token.getType() + "\' instead");
+                    String.format("Expect token to be '%s', received '%s' instead", tokenType, token.getType()));
         }
     }
 

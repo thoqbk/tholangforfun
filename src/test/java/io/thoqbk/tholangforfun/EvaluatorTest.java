@@ -298,4 +298,30 @@ public class EvaluatorTest {
         Program p = new Parser(input).parse();
         assertEquals(10, new Evaluator().eval(p).as(ReturnResult.class).getValue().as(IntResult.class).getValue());
     }
+
+    @Test
+    public void gteTest() {
+        String input = """
+                let n = 10;
+                if (n >= 10) {
+                    return "yes";
+                }
+                return "no";
+                """;
+                Program p = new Parser(input).parse();
+                assertEquals("yes", new Evaluator().eval(p).as(ReturnResult.class).getValue().as(StrResult.class).getValue());
+    }
+
+    @Test
+    public void lteTest() {
+        String input = """
+                let n = 10;
+                if (n <= 9) {
+                    return "yes";
+                }
+                return "no";
+                """;
+                Program p = new Parser(input).parse();
+                assertEquals("no", new Evaluator().eval(p).as(ReturnResult.class).getValue().as(StrResult.class).getValue());
+    }
 }

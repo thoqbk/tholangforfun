@@ -198,6 +198,12 @@ public class Evaluator {
             case LT: {
                 return new BoolResult(left.as(IntResult.class).getValue() < right.as(IntResult.class).getValue());
             }
+            case GTE: {
+                return new BoolResult(left.as(IntResult.class).getValue() >= right.as(IntResult.class).getValue());
+            }
+            case LTE: {
+                return new BoolResult(left.as(IntResult.class).getValue() <= right.as(IntResult.class).getValue());
+            }
             case EQ: {
                 return evalEqual(left, right);
             }
