@@ -34,6 +34,10 @@ put message;
 
 ## Build
 
+Prerequisites:
+- [Java 16+](https://adoptopenjdk.net/)
+- [Maven](https://maven.apache.org/install.html)
+
 Move to the root directory of the project then run the folllowing command
 
 ```
@@ -53,7 +57,7 @@ java -jar tl4f.jar <source file>.tl4f
 Or checkout examples in [examples](./examples/) folder e.g. 
 
 ```
-java -jar target/tl4f.jar examples/put.tl4f
+java -jar tl4f.jar examples/put.tl4f
 ```
 
 Result:
