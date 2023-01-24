@@ -1,6 +1,6 @@
 # ThoLangForFun programming language
 
-An effort to implement a simple programming language for fun
+An effort to implement another programming language for fun
 
 Sample code:
 
