@@ -32,6 +32,8 @@ while (n > 0) {
 put message;
 ```
 
+More [examples](./examples/)
+
 ## Build
 
 Prerequisites:
