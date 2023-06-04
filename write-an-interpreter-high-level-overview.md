@@ -1,4 +1,4 @@
-# Writing an Interpreter
+# Writing an Interpreter: High-Level Overview
 
 ## Introduction
 
@@ -40,3 +40,5 @@ The following logics will happens in components:
 - Lexer breaks down the code and represent it as a list of token objects with type. In this example, there are 4 types: print, int number (10 and 2), plus and semicolon.
 - Parser iterates through the list of tokens to form statement object. In this case, it's a PrintStatement with expression is a infix AST.
 - Evaluator iterates through the list of statments getting from Parser, evalute them and give the final result. In this case, it's printing 12 to the console
+
+Part 2: [Implementation](./write-an-interpreter-implementation.md)
