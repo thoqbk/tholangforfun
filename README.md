@@ -2,8 +2,9 @@
 
 An effort to implement another programming language for fun
 
-Learn more about how the interpreter work:
-- [Part 1](./write-an-interpreter.md)
+Learn about how to implement an intepreter:
+- [Part 1: High-Level Overview](./write-an-interpreter-high-level-overview.md)
+- [Part 2: Implementation](./write-an-interpreter-implementation.md)
 
 Sample code:
 
