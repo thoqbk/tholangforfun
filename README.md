@@ -2,6 +2,9 @@
 
 An effort to implement another programming language for fun
 
+Learn more about how the interpreter work:
+- [Part 1](./write-an-interpreter.md)
+
 Sample code:
 
 Function & recursion:
