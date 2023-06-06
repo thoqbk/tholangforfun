@@ -2,7 +2,7 @@
 
 An effort to implement another programming language for fun
 
-Learn about how to implement an intepreter:
+Learn how to implement an intepreter:
 - [Part 1: High-Level Overview](./write-an-interpreter-high-level-overview.md)
 - [Part 2: Implementation](./write-an-interpreter-implementation.md)
 
