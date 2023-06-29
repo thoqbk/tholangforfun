@@ -42,3 +42,8 @@ The following logics will happens in components:
 - Evaluator iterates through the list of statments getting from Parser, evalute them and give the final result. In this case, it's printing 12 to the console
 
 Part 2: [Implementation](./write-an-interpreter-implementation.md)
+
+## References:
+- [Top Down Operator Precedence](https://tdop.github.io/)
+- [Pratt Parsers: Expression Parsing Made Easy](https://journal.stuffwithstuff.com/2011/03/19/pratt-parsers-expression-parsing-made-easy/)
+- Book [Write a intepreter in Go](https://interpreterbook.com/)
